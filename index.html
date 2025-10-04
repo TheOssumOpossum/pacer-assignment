@@ -38,6 +38,103 @@
         .validation-border {
             border: 2px solid #ef4444 !important;
         }
+
+        /* --- Custom Responsive Table Styles --- */
+        
+        /* Global fix for pace preference height (applies to all views) */
+        .pace-container {
+            /* Max height equivalent to roughly 3 lines of text-xs badges (~4.5rem/72px) */
+            max-height: 4.5rem; 
+            overflow-y: auto;
+            padding-right: 0.5rem; /* Space for scrollbar */
+            /* Ensure the content is not wrapped and stays on the left */
+            align-items: flex-start; 
+            align-content: flex-start;
+        }
+
+        /* Mobile (Default: below sm breakpoint) Card View Transformation */
+        @media (max-width: 640px) {
+            #runners-table {
+                /* Ensure table takes full width but allows styling on rows */
+                display: block; 
+            }
+            #runners-table thead {
+                /* Hide the table headers on mobile */
+                display: none;
+            }
+
+            #runners-table tr {
+                /* Make each row look like a block/card */
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 0.75rem;
+                background-color: white;
+                position: relative; /* For absolute positioning of delete button */
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            }
+            
+            #runners-table td {
+                display: flex;
+                align-items: center;
+                padding: 0; /* Remove default padding */
+                border: none;
+                width: 100%; /* Ensure all cells take full card width */
+            }
+
+            /* Add labels to cells (tds) on mobile for clarity and order */
+            #runners-table td:nth-child(1) { order: -2; justify-content: flex-start; padding-bottom: 0.5rem; border-bottom: 1px solid #f3f4f6; } 
+            #runners-table td:nth-child(1) .text-sm::before { content: 'Runner #'; font-weight: 600; margin-right: 0.5rem; color: #4f46e5; }
+            
+            #runners-table td:nth-child(2) { order: 1; flex-direction: column; align-items: flex-start; }
+            #runners-table td:nth-child(2)::before { content: 'Runner Name'; font-weight: 600; margin-bottom: 0.25rem; color: #4f46e5; }
+            
+            #runners-table td:nth-child(3) { order: 2; }
+            #runners-table td:nth-child(3) input { text-align: left; }
+            #runners-table td:nth-child(3)::before { content: 'Seniority (1 = Most)'; font-weight: 600; margin-right: 0.5rem; color: #4f46e5; }
+            
+            #runners-table td:nth-child(4) { order: 3; flex-direction: column; align-items: flex-start; }
+            #runners-table td:nth-child(4)::before { content: 'Pace Preferences (min/mile)'; font-weight: 600; margin-bottom: 0.25rem; color: #4f46e5; }
+            
+            #runners-table td:nth-child(5) { order: 4; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid #f3f4f6; }
+            #runners-table td:nth-child(5) .sr-only { display: block; } /* Show Active label for mobile card */
+            
+            #runners-table td:nth-child(6) { 
+                order: -1; 
+                justify-content: flex-end; 
+                position: absolute; 
+                top: 0.5rem; 
+                right: 0.5rem; 
+                width: auto;
+            } /* Delete button */
+
+            /* Full width for inputs inside the card to maximize space */
+            .runner-name, .runner-seniority {
+                width: 100%;
+            }
+
+            /* Hide the sr-only element on desktop */
+            #runners-table td:nth-child(5) label .sr-only {
+                display: none;
+            }
+        }
+        
+        /* Desktop/Tablet (sm: and up) column widths (ensure good proportions) */
+        @media (min-width: 641px) {
+            .runner-name-col { width: 25%; } /* More space for name */
+            .seniority-col { width: 10%; } /* Reduced space for seniority */
+            .pace-prefs-col { width: 45%; } /* Max space for paces */
+            .active-col { width: 5%; }
+            .action-col { width: 10%; }
+
+            /* Ensure table cells have correct alignment on desktop */
+            #runners-table td:nth-child(2) { text-align: left; }
+            #runners-table td:nth-child(3) { text-align: center; }
+            #runners-table td:nth-child(4) { text-align: left; }
+        }
     </style>
 </head>
 <body class="bg-background min-h-screen p-4 sm:p-8 font-sans">
@@ -64,17 +161,16 @@
 
             <div id="runner-view-container">
                 <p class="text-sm text-gray-600 mb-4">Runners are validated in real-time. Active runners missing a name, having a duplicate name, or missing a pace will be highlighted in red.</p>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto sm:overflow-x-visible">
                     <table id="runners-table" class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <!-- Adjusted widths for better mobile distribution -->
                                 <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]">#</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[35%] sm:w-[20%]">Runner Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%] sm:w-[10%]">Seniority (1 = Most)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%] sm:w-[50%]">Pace Preferences (min/mile)</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]">Active</th>
-                                <th class="px-3 py-3 w-[10%]"></th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider runner-name-col">Runner Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider seniority-col">Seniority (1 = Most)</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pace-prefs-col">Pace Preferences (min/mile)</th>
+                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider active-col">Active</th>
+                                <th class="px-3 py-3 action-col"></th>
                             </tr>
                         </thead>
                         <tbody id="runners-list" class="bg-white divide-y divide-gray-200">
@@ -152,26 +248,25 @@
                     hover:bg-gray-200 transition duration-150 ease-in-out m-0.5 whitespace-nowrap">
                     ${n.split(" ")[0]}
                 </label>
-            `).join("")}function renderRRow(e,t){let n=document.createElement("tr");return n.id=`runner-row-${e.id}`,n.className="runner-row",n.innerHTML=`
+            `).join("")}function renderRRow(e,t){let n=document.createElement("tr");return n.id=`runner-row-${e.id}`,n.className="runner-row hover:bg-gray-50 transition duration-150 relative",n.innerHTML=`
                 <td class="px-3 py-3 whitespace-nowrap">
                     <span class="text-sm text-gray-500">${t+1}</span>
                 </td>
-                <td class="px-6 py-3 whitespace-nowrap">
+                <td class="px-6 py-3">
                     <input type="text" placeholder="e.g., Jane Doe" required value="${e.name}" data-runner-id="${e.id}"
                         class="runner-name w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary">
                 </td>
                 <td class="px-6 py-3 whitespace-nowrap">
-                    <!-- Adjusted width on input for mobile responsiveness -->
                     <input type="number" value="${e.seniority}" min="1" required data-runner-id="${e.id}"
-                        class="runner-seniority w-14 sm:w-20 p-2 border border-gray-300 rounded-lg text-sm text-center focus:ring-primary focus:border-primary">
+                        class="runner-seniority w-full sm:w-20 p-2 border border-gray-300 rounded-lg text-sm text-center focus:ring-primary focus:border-primary">
                 </td>
-                <td class="px-6 py-3 whitespace-nowrap">
+                <td class="px-6 py-3">
                     <div id="pace-container-${e.id}" class="pace-container flex flex-wrap space-x-1 p-1 border border-transparent rounded-lg transition duration-150 ease-in-out">
                         ${generatePaceCheckboxes(e.id,e.paces)}
                     </div>
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap">
-                    <div class="flex justify-center items-center h-full">
+                    <div class="flex justify-center sm:justify-start items-center h-full">
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" ${e.active?"checked":""} class="sr-only peer runner-active-toggle" data-runner-id="${e.id}">
                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
@@ -186,7 +281,7 @@
                         </svg>
                     </button>
                 </td>
-            `,n}function renderRView(){let e=document.getElementById("runners-list");e.innerHTML="";let t=Object.values(R).sort((e,t)=>e.seniority-t.seniority),n=findDups();t.forEach((t,r)=>{let a=renderRRow(t,r);e.appendChild(a),validateRow(t.id,n)}),setupRListeners()}function setupRListeners(){let e=document.getElementById("runners-list");e.removeEventListener("change",handleRInput),e.removeEventListener("input",handleRInput),e.addEventListener("change",handleRInput),e.addEventListener("input",handleRInput)}function handleRInput(e){let t=e.target,n=t.dataset.runnerId;if(!R[n])return;if(t.classList.contains("runner-name"))updateRunnerData(n,"name",t.value.trim());else if(t.classList.contains("runner-seniority"))updateRunnerData(n,"seniority",parseInt(t.value));else if(t.classList.contains("runner-active-toggle"))updateRunnerData(n,"active",t.checked);else if(t.classList.contains("pace-checkbox")){let r=R[n],a=r.paces,s=t.getAttribute("data-pace");if(t.checked)a.includes(s)||a.push(s);else{let i=a.indexOf(s);i>-1&&a.splice(i,1)}r.paces=a}let l=findDups();t.classList.contains("runner-name")||t.classList.contains("runner-active-toggle")?Object.keys(R).forEach(e=>{validateRow(e,l)}):validateRow(n,l),markChanged()}function syncData(){if("pace"===currentView)return;let e=document.querySelectorAll(".runner-row"),t=findDups();e.forEach(e=>{let n=e.id.replace("runner-row-","");if(!R[n])return;let r=e.querySelector(".runner-name"),a=e.querySelector(".runner-seniority"),s=e.querySelector(".runner-active-toggle"),i=e.querySelectorAll(".pace-checkbox"),l=Array.from(i).filter(e=>e.checked).map(e=>e.getAttribute("data-pace"));R[n].name=r.value.trim(),R[n].seniority=parseInt(a.value)||1,R[n].paces=l,R[n].active=s.checked,validateRow(n,t)})}function exportRunners(){syncData();let e=Object.values(R).filter(e=>e.name).map(e=>({name:e.name,seniority:e.seniority,paces:e.paces,active:e.active})),t=JSON.stringify(e,null,2);navigator.clipboard?navigator.clipboard.writeText(t).then(()=>{sEl.textContent="Status: Runner data copied to clipboard as JSON!",sEl.className="success font-bold text-lg mb-4"}).catch(e=>{console.error("Failed to copy text: ",e),prompt("Copy the following JSON data manually:",t),sEl.textContent="Status: Clipboard copy failed. Data ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary"}):(prompt("Copy the following JSON data manually:",t),sEl.textContent="Status: Runner data ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary")}function importRunners(){let e=prompt("Paste the JSON string containing runner data here:");if(!e){sEl.textContent="Status: Import cancelled.",sEl.className="font-bold text-lg mb-4 text-gray-800";return}try{let t=JSON.parse(e);if(!Array.isArray(t)||t.some(e=>"object"!=typeof e||void 0===e.name||void 0===e.seniority))throw Error("Invalid JSON structure. Expected an array of runner objects with 'name' and 'seniority' fields.");clearAllRunners(!0),t.forEach(e=>{createNewRunnerInData(e.name,e.seniority,e.paces||[],void 0===e.active||e.active)}),"runner"===currentView?renderRView():renderPView(),markChanged(),window.scrollTo({top:0,behavior:"smooth"}),sEl.textContent=`Status: Successfully imported ${t.length} runners. Run the solver to get assignments.`,sEl.className="success font-bold text-lg mb-4"}catch(n){console.error("Import Error:",n),sEl.textContent=`Error: Failed to import data. ${n.message||"Invalid JSON format."}`,sEl.className="error font-bold text-lg mb-4"}}function generatePaceGroups(){let e={};for(let t=14;t<=22;t++){let n=t/2,r=Math.floor(n),a=Math.round((n-r)*60),s=`${r}:${a.toString().padStart(2,"0")} min/mile`;e[s]=n}return e}function solveAssignmentProblem(e){let t=generatePaceGroups(),n=Object.keys(t),r={...t},a=Math.max(...Object.values(r)),s=Object.keys(e);if(0===s.length)return{error:"No active runners provided for assignment."};let i={},l={};s.forEach(t=>{i[t]=e[t].paces,l[t]=e[t].seniority});let o=s.sort((e,t)=>{let n=l[e]-l[t];return 0!==n?n:e.localeCompare(t)}),d=Math.max(...Object.values(l)),u=Object.fromEntries(o.map(e=>[e,d+1-l[e]])),c=Object.fromEntries(n.map(e=>[e,a-r[e]])),m={};for(let p of o)for(let f of n){let g=i[p].includes(f);m[`${p}|${f}`]=g?u[p]*c[f]*1e-6:0}let $={};for(let b of o)for(let h of n)$[`${b}|${h}`]=i[b].includes(h)?1:0;let v={optimize:"range",opType:"min",constraints:{},variables:{},ints:{}};v.variables.Z_max={range:1},v.variables.Z_min={range:-1},n.forEach(e=>{let t=`N_${e}`;v.variables[t]={[`count_link_${e}`]:1,[`max_bound_${e}`]:-1,[`min_bound_${e}`]:-1},v.ints[t]=1,v.constraints[`count_link_${e}`]={equal:0},v.constraints[`max_bound_${e}`]={min:0},v.variables.Z_max[`max_bound_${e}`]=1,v.constraints[`min_bound_${e}`]={max:0},v.variables.Z_min[`min_bound_${e}`]=1}),o.forEach(e=>{let t=`runner_assign_${e}`;v.constraints[t]={equal:1},n.forEach(n=>{let r=`assign_${e}_${n}`;v.variables[r]={[t]:1,[`count_link_${n}`]:-1},v.ints[r]=1;let a=`ability_${e}_${n}`;v.constraints[a]={min:0,max:$[`${e}|${n}`]},v.variables[r][a]=1})});let x=solver.Solve(v);if(!x.feasible)return{error:"No feasible solution found. Cannot assign all runners based on preferences."};let y=x.result,w={optimize:"totalCost",opType:"min",constraints:{},variables:{},ints:{}};w.variables.Z_max_2={fixed_range:1},w.variables.Z_min_2={fixed_range:-1},n.forEach(e=>{let t=`N2_${e}`;w.variables[t]={[`count_link_2_${e}`]:1,[`max_bound_2_${e}`]:-1,[`min_bound_2_${e}`]:-1},w.ints[t]=1,w.constraints[`count_link_2_${e}`]={equal:0},w.constraints[`max_bound_2_${e}`]={min:0},w.variables.Z_max_2[`max_bound_2_${e}`]=1,w.constraints[`min_bound_2_${e}`]={max:0},w.variables.Z_min_2[`min_bound_2_${e}`]=1}),o.forEach(e=>{let t=`runner_assign_2_${e}`;w.constraints[t]={equal:1},n.forEach(n=>{let a=`assign_${e}_${n}`,s=r[n]-m[`${e}|${n}`];w.variables[a]={totalCost:s,[t]:1,[`count_link_2_${n}`]:-1},w.ints[a]=1;let i=`ability_2_${e}_${n}`;w.constraints[i]={min:0,max:$[`${e}|${n}`]},w.variables[a][i]=1})}),w.constraints.fixed_range={equal:y};let E=solver.Solve(w);if(!E.feasible)return{error:"Failed to find a pace-optimal solution that maintains the minimum group balance. Try reducing constraints."};let _={assignments:{},groups:{}};for(let S in n.forEach(e=>_.groups[e]=[]),e){for(let C of n)1===E[`assign_${S}_${C}`]&&(_.assignments[S]=C,_.groups[C].push(S));delete e[S].paces}return _.meta={minRange:y,totalCost:E.result},_}function runSolver(){if(syncData(),!inputChanged&&hasEverSolved){sEl.textContent="Status: Input has not changed since last successful solve.",sEl.className="font-bold text-lg mb-4 text-gray-800";return}resEl.innerHTML="",sEl.textContent="Status: Validating runner data...",sEl.className="font-bold text-lg mb-4 text-gray-800";let e={},t=!1,n=!1,r=findDups(),a=r.size>0;if(Object.values(R).forEach(a=>{if(validateRow(a.id,r),!a.active)return;let s=a.name;s.trim()||(t=!0),s.trim()&&0===a.paces.length&&(n=!0),s.trim()&&a.paces.length>0&&!r.has(a.id)&&(e[a.id]=a)}),t||a||n){let s=[];t&&s.push("One or more active runners are missing a **Name**."),a&&s.push("One or more active runners have **Duplicate Names**."),n&&s.push("One or more active runners have **No Pace Preferences** selected."),sEl.textContent=`Error: Data validation failed. ${s.join(" ")}`,sEl.className="error font-bold text-lg mb-4","pace"===currentView&&switchView("runner"),setBtnState(!0);return}if(0===Object.keys(e).length){sEl.textContent="Status: No active or valid runner data provided.",sEl.className="font-bold text-lg mb-4 text-gray-800",setBtnState(!1);return}let i=solveAssignmentProblem(e);i.error?(sEl.textContent=`Error: ${i.error}`,sEl.className="error font-bold text-lg mb-4",resEl.innerHTML='<p class="text-red-600 p-3 bg-red-50 rounded-lg">Optimization failed. Check if all active runners have at least one pace preference selected and if the preferences allow for a balanced solution.</p>',setBtnState(!0)):(sEl.textContent="Status: Done!",sEl.className="success font-bold text-lg mb-4",displayResults(i,e),inputChanged=!1,hasEverSolved=!0,setBtnState(!1))}function displayResults(e,t){resEl.innerHTML=`
+            `,n}function renderRView(){let e=document.getElementById("runners-list");e.innerHTML="";let t=Object.values(R).sort((e,t)=>e.seniority-t.seniority),n=findDups();t.forEach((t,r)=>{let a=renderRRow(t,r);e.appendChild(a),validateRow(t.id,n)}),setupRListeners()}function setupRListeners(){let e=document.getElementById("runners-list");e.removeEventListener("change",handleRInput),e.removeEventListener("input",handleRInput),e.addEventListener("change",handleRInput),e.addEventListener("input",handleRInput)}function handleRInput(e){let t=e.target,n=t.dataset.runnerId;if(!R[n])return;if(t.classList.contains("runner-name"))updateRunnerData(n,"name",t.value.trim());else if(t.classList.contains("runner-seniority"))updateRunnerData(n,"seniority",parseInt(t.value));else if(t.classList.contains("runner-active-toggle"))updateRunnerData(n,"active",t.checked);else if(t.classList.contains("pace-checkbox")){let r=R[n],a=r.paces,s=t.getAttribute("data-pace");if(t.checked)a.includes(s)||a.push(s);else{let i=a.indexOf(s);i>-1&&a.splice(i,1)}r.paces=a}let l=findDups();t.classList.contains("runner-name")||t.classList.contains("runner-active-toggle")?Object.keys(R).forEach(e=>{validateRow(e,l)}):validateRow(n,l),markChanged()}function syncData(){if("pace"===currentView)return;let e=document.querySelectorAll(".runner-row"),t=findDups();e.forEach(e=>{let n=e.id.replace("runner-row-","");if(!R[n])return;let r=e.querySelector(".runner-name"),a=e.querySelector(".runner-seniority"),s=e.querySelector(".runner-active-toggle"),i=e.querySelectorAll(".pace-checkbox"),l=Array.from(i).filter(e=>e.checked).map(e=>e.getAttribute("data-pace"));R[n].name=r.value.trim(),R[n].seniority=parseInt(a.value)||1,R[n].paces=l,R[n].active=s.checked,validateRow(n,t)})}function exportRunners(){syncData();let e=Object.values(R).filter(e=>e.name).map(e=>({name:e.name,seniority:e.seniority,paces:e.paces,active:e.active})),t=JSON.stringify(e,null,2);navigator.clipboard?navigator.clipboard.writeText(t).then(()=>{sEl.textContent="Status: Runner data copied to clipboard as JSON!",sEl.className="success font-bold text-lg mb-4"}).catch(e=>{console.error("Failed to copy text: ",e),prompt("Copy the following JSON data manually:",t),sEl.textContent="Status: Clipboard copy failed. Data ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary"}):(prompt("Copy the following JSON data manually:",t),sEl.textContent="Status: Runner data ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary")}function importRunners(){let e=prompt("Paste the JSON string containing runner data here:");if(!e){sEl.textContent="Status: Import cancelled.",sEl.className="font-bold text-lg mb-4 text-gray-800";return}try{let t=JSON.parse(e);if(!Array.isArray(t)||t.some(e=>"object"!=typeof e||void 0===e.name||void 0===e.seniority))throw Error("Invalid JSON structure. Expected an array of runner objects with 'name' and 'seniority' fields.");clearAllRunners(!0),t.forEach(e=>{createNewRunnerInData(e.name,e.seniority,e.paces||[],void 0===e.active||e.active)}),"runner"===currentView?renderRView():renderPView(),markChanged(),window.scrollTo({top:0,behavior:"smooth"}),sEl.textContent=`Status: Successfully imported ${t.length} runners. Run the solver to get assignments.`,sEl.className="success font-bold text-lg mb-4"}catch(n){console.error("Import Error:",n),sEl.textContent=`Error: Failed to import data. ${n.message||"Invalid JSON format."}`,sEl.className="error font-bold text-lg mb-4"}}function generatePaceGroups(){let e={};for(let t=14;t<=22;t++){let n=t/2,r=Math.floor(n),a=Math.round((n-r)*60),s=`${r}:${a.toString().padStart(2,"0")} min/mile`;e[s]=n}return e}function solveAssignmentProblem(e){let t=generatePaceGroups(),n=Object.keys(t),r={...t},a=Math.max(...Object.values(r)),s=Object.keys(e);if(0===s.length)return{error:"No active runners provided for assignment."};let i={},l={};s.forEach(t=>{i[t]=e[t].paces,l[t]=e[t].seniority});let o=s.sort((e,t)=>{let n=l[e]-l[t];return 0!==n?n:e.localeCompare(t)}),d=Math.max(...Object.values(l)),u=Object.fromEntries(o.map(e=>[e,d+1-l[e]])),c=Object.fromEntries(n.map(e=>[e,a-r[e]])),m={};for(let p of o)for(let f of n){let g=i[p].includes(f);m[`${p}|${f}`]=g?u[p]*c[f]*1e-6:0}let $={};for(let b of o)for(let h of n)$[`${b}|${h}`]=i[b].includes(h)?1:0;let v={optimize:"range",opType:"min",constraints:{},variables:{},ints:{}};v.variables.Z_max={range:1},v.variables.Z_min={range:-1},n.forEach(e=>{let t=`N_${e}`;v.variables[t]={[`count_link_${e}`]:1,[`max_bound_${e}`]:-1,[`min_bound_${e}`]:-1},v.ints[t]=1,v.constraints[`count_link_${e}`]={equal:0},v.constraints[`max_bound_${e}`]={min:0},v.variables.Z_max[`max_bound_${e}`]=1,v.constraints[`min_bound_${e}`]={max:0},v.variables.Z_min[`min_bound_${e}`]=1}),o.forEach(e=>{let t=`runner_assign_${e}`;v.constraints[t]={equal:1},n.forEach(n=>{let r=`assign_${e}_${n}`;v.variables[r]={[t]:1,[`count_link_${n}`]:-1},v.ints[r]=1;let a=`ability_${e}_${n}`;v.constraints[a]={min:0,max:$[`${e}|${n}`]},v.variables[r][a]=1})});let y=solver.Solve(v);if(!y.feasible)return{error:"No feasible solution found. Cannot assign all runners based on preferences."};let x=y.result,w={optimize:"totalCost",opType:"min",constraints:{},variables:{},ints:{}};w.variables.Z_max_2={fixed_range:1},w.variables.Z_min_2={fixed_range:-1},n.forEach(e=>{let t=`N2_${e}`;w.variables[t]={[`count_link_2_${e}`]:1,[`max_bound_2_${e}`]:-1,[`min_bound_2_${e}`]:-1},w.ints[t]=1,w.constraints[`count_link_2_${e}`]={equal:0},w.constraints[`max_bound_2_${e}`]={min:0},w.variables.Z_max_2[`max_bound_2_${e}`]=1,w.constraints[`min_bound_2_${e}`]={max:0},w.variables.Z_min_2[`min_bound_2_${e}`]=1}),o.forEach(e=>{let t=`runner_assign_2_${e}`;w.constraints[t]={equal:1},n.forEach(n=>{let a=`assign_${e}_${n}`,s=r[n]-m[`${e}|${n}`];w.variables[a]={totalCost:s,[t]:1,[`count_link_2_${n}`]:-1},w.ints[a]=1;let i=`ability_2_${e}_${n}`;w.constraints[i]={min:0,max:$[`${e}|${n}`]},w.variables[a][i]=1})}),w.constraints.fixed_range={equal:x};let E=solver.Solve(w);if(!E.feasible)return{error:"Failed to find a pace-optimal solution that maintains the minimum group balance. Try reducing constraints."};let _={assignments:{},groups:{}};for(let S in n.forEach(e=>_.groups[e]=[]),e){for(let C of n)1===E[`assign_${S}_${C}`]&&(_.assignments[S]=C,_.groups[C].push(S));delete e[S].paces}return _.meta={minRange:x,totalCost:E.result},_}function runSolver(){if(syncData(),!inputChanged&&hasEverSolved){sEl.textContent="Status: Input has not changed since last successful solve.",sEl.className="font-bold text-lg mb-4 text-gray-800";return}resEl.innerHTML="",sEl.textContent="Status: Validating runner data...",sEl.className="font-bold text-lg mb-4 text-gray-800";let e={},t=!1,n=!1,r=findDups(),a=r.size>0;if(Object.values(R).forEach(a=>{if(validateRow(a.id,r),!a.active)return;let s=a.name;s.trim()||(t=!0),s.trim()&&0===a.paces.length&&(n=!0),s.trim()&&a.paces.length>0&&!r.has(a.id)&&(e[a.id]=a)}),t||a||n){let s=[];t&&s.push("One or more active runners are missing a **Name**."),a&&s.push("One or more active runners have **Duplicate Names**."),n&&s.push("One or more active runners have **No Pace Preferences** selected."),sEl.textContent=`Error: Data validation failed. ${s.join(" ")}`,sEl.className="error font-bold text-lg mb-4","pace"===currentView&&switchView("runner"),setBtnState(!0);return}if(0===Object.keys(e).length){sEl.textContent="Status: No active or valid runner data provided.",sEl.className="font-bold text-lg mb-4 text-gray-800",setBtnState(!1);return}let i=solveAssignmentProblem(e);i.error?(sEl.textContent=`Error: ${i.error}`,sEl.className="error font-bold text-lg mb-4",resEl.innerHTML='<p class="text-red-600 p-3 bg-red-50 rounded-lg">Optimization failed. Check if all active runners have at least one pace preference selected and if the preferences allow for a balanced solution.</p>',setBtnState(!0)):(sEl.textContent="Status: Done!",sEl.className="success font-bold text-lg mb-4",displayResults(i,e),inputChanged=!1,hasEverSolved=!0,setBtnState(!1))}function displayResults(e,t){resEl.innerHTML=`
                 <h3 class="font-semibold text-lg text-gray-800 pb-2">Assignments by Pace Group</h3>
                 <div id="groups-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             `;let n=document.getElementById("groups-list"),r=Object.keys(e.groups).sort((e,t)=>{let n=e=>{let[t,n]=e.split(" ")[0].split(":").map(Number);return t+n/60};return n(e)-n(t)});r.forEach(r=>{let a=e.groups[r];if(a.length>0){let s=a.sort((e,n)=>t[e].seniority-t[n].seniority),i=s.map(e=>{let n=t[e];return`<span class="inline-block bg-primary/20 text-primary px-2 py-0.5 text-xs font-medium rounded-full m-0.5">${n.name} (${n.seniority})</span>`}).join("");n.innerHTML+=`

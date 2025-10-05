@@ -237,15 +237,23 @@
 <body class="bg-background min-h-screen p-4 sm:p-8 font-sans">
 
     <div class="max-w-6xl mx-auto">
-        <header class="text-center mb-8">
+        <header class="text-center mb-4">
             <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">Pace Assigner</h1>
-
         </header>
-        <div class="text-left mb-2">
-        <p class="text-gray-600">Add runners and their preferred paces in the 'Runner Configuration' section and then hit 'Assign Paces' in the results section below. Only 'Active' runners will be assigned to a pace group.
-            <br> You can edit runners' preferences in the 'View by Runner' tab or you can make quick adjustments to each pace in the 'View by Pace' tab.
-        <br> After configuring  each runner, it may be helpful to save the settings with the 'Export Runners' button so that you can easily 'Import Runners' the next time, just be sure to save the copied text somewhere else. </p>
-        </div>
+        <details class="text-left mb-6">
+            <summary class="cursor-pointer text-md font-semibold text-gray-700 hover:text-primary transition duration-150">
+                Instructions
+            </summary>
+            <div class="bg-white p-4 rounded-lg shadow-inner mt-2 border border-gray-100">
+                <p class="text-gray-600">
+                    Add runners and their preferred paces in the 'Runner Configuration' section and then hit 'Assign Paces' in the results section below. Only 'Active' runners will be assigned to a pace group.
+                    <br>
+                    You can edit runners' preferences in the 'View by Runner' tab or you can make quick adjustments to each pace in the 'View by Pace' tab.
+                    <br>
+                    After configuring each runner, it may be helpful to save the settings with the 'Export Runners' button so that you can easily 'Import Runners' the next time, just be sure to save the copied text somewhere else.
+                </p>
+            </div>
+        </details>
         <div class="bg-card shadow-xl rounded-xl p-6 sm:p-8 mb-8">
             <h2 class="text-2xl font-semibold text-primary mb-6 border-b pb-3">Runner Configuration</h2>
 
@@ -343,24 +351,28 @@
             </button>
         </div>
         <br>
-        <div class="text-left mb-8">
-            <p class="text-gray-600">Each pacer will be assigned one pace group that they listed in their preferences.
-                <br>Some pace groups may be unassigned if there are not enough pacers or if nobody said they were available.
+        <details class="text-left mb-8">
+            <summary class="cursor-pointer text-md font-semibold text-gray-700 hover:text-primary transition duration-150">
+                Assignment Details
+            </summary>
+            <div class="bg-white p-4 rounded-lg shadow-inner mt-2 border border-gray-100">
+                <p class="text-gray-600">Each pacer will be assigned one pace group that they listed in their preferences.
+                    <br>Some pace groups may be unassigned if there are not enough pacers or if nobody said they were available.
                 </p>
-                <p class="text-gray-600 py-1">The optimizer has 3 objectives which it will fulfill in order:</p>
-            <ol class="text-gray-600 list-decimal px-8">
-                <li>
-                    Avoid large groups, spread the pacers out as evenly as possible
-                </li>
-                <li>
-                    If multiple configurations are possible, assign a pacer to their fastest possible pace
-                </li>
-                <li>
-                    If there are still multiple configurations possible, pacers will be assigned to their fastest pace in order of seniority
-                </li>
-            </ol>
-            <p class="text-gray-600 py-1">Trhe optimizer has 3 objectives which it will fulfill in orde:</p>
-        </div>
+                <p class="text-gray-600 py-1 mt-3">The optimizer has 3 objectives which it will fulfill in order:</p>
+                <ol class="text-gray-600 list-decimal px-8">
+                    <li>
+                        Avoid large groups, spread the pacers out as evenly as possible
+                    </li>
+                    <li>
+                        If multiple configurations are possible, assign a pacer to their fastest possible pace
+                    </li>
+                    <li>
+                        If there are still multiple configurations possible, pacers will be assigned to their fastest pace in order of seniority.
+                    </li>
+                </ol>
+            </div>
+        </details>
 
         <script>
             // Global Constants and State

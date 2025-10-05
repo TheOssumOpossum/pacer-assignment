@@ -46,6 +46,10 @@
         }
 
         /* Custom style for drag indicator */
+                .runner-bubble {
+            cursor: pointer;
+        }
+
         .runner-bubble:hover {
             cursor: grab;
         }
@@ -54,9 +58,19 @@
             cursor: grabbing;
         }
 
-        /* Highlighting for drop zone */
+        /* Highlighting for drop zone / click-to-move target */
         .drag-over {
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.5);
+            border-color: #4f46e5;
+        }
+
+        /* New style for selected runner */
+        .selected-runner {
+            /* Highlight the selected bubble */
+            outline: 2px solid #f97316;
+            box-shadow: 0 0 5px rgba(249, 115, 22, 0.5);
+            transform: scale(1.05);
+            transition: all 150ms ease-in-out;
         }
 
         .tab-inactive {
@@ -949,7 +963,6 @@
                 const duplicateIds = findDups();
 
                 sortedRunners.forEach((runner, index) => {
-                    console.log(runner, index)
                     const newRow = renderRRow(runner, index);
                     tableBody.appendChild(newRow);
                     validateRow(runner.id, duplicateIds);
@@ -1101,23 +1114,79 @@
                 //         paces: r.paces,
                 //         active: r.active
                 //     }));
+                // displayResults(assignments, activeRunnerData);
 
-                const jsonString = result_string
+    // htmlString =
+                // 1. Load the HTML string into a temporary DOM structure for parsing
+    // const parser = new DOMParser();
+    // const doc = parser.parseFromString(htmlString, 'text/html');
+
+    // 2. Select all pace group containers
+    const paceGroups = document.querySelectorAll('.pace-group');
+
+    let resultLines = ''
+
+    paceGroups.forEach(group => {
+        // 3. Extract the pace time from the element's ID (e.g., "pace-7:30" -> "7:30")
+        const paceId = group.id;
+        let pace = '';
+        if (paceId.startsWith('pace-')) {
+            // Replace the dash in the ID with a colon for a cleaner pace format
+            pace = paceId.replace('pace-', '').replace('-', ':');
+        } else {
+            // Fallback if ID structure changes
+            const pElement = group.querySelector('p');
+            if (pElement) {
+                // Get the text before "min/mile" and clean it up
+                pace = pElement.textContent.split('min/mile')[0].trim();
+            } else {
+                pace = 'Unknown Pace';
+            }
+        }
+
+        // 4. Find the runner container and all runner name spans
+        const runnerContainer = group.querySelector('.pace-runners');
+        const runnerBubbles = runnerContainer ? runnerContainer.querySelectorAll('.runner-bubble') : [];
+
+        const runnerNames = [];
+
+        // 5. Extract and clean up runner names
+        runnerBubbles.forEach(runnerSpan => {
+            let name = runnerSpan.textContent.trim();
+            // Remove the trailing runner count (e.g., "(1)") from the name
+            name = name.replace(/\s*\(\d+\)$/, '');
+            runnerNames.push(name);
+        });
+
+        // 6. Format the output line: "[pace]: [runnername], [runnername]"
+        let runnersList = '';
+        if (runnerNames.length > 0) {
+        runnersList = runnerNames.join(', ');
+        }
+        // Only include the line if the pace is defined
+        if (pace) {
+            //  resultLines.push(`${pace}: ${runnersList}`);
+             resultLines += `${pace}: ${runnersList}\n`
+        }
+    });
+
+    // 7. Join all lines with newlines
+    // resultLines.join('\\n');
 
                 if (navigator.clipboard) {
-                    navigator.clipboard.writeText(jsonString).then(() => {
+                    navigator.clipboard.writeText(resultLines).then(() => {
                         sEl.textContent = 'Status: Runner assignments copied to clipboard!';
                         sEl.className = 'success font-bold text-lg mb-4';
                     }).catch(err => {
                         console.error('Failed to copy text: ', err);
                         // Fallback for browsers without clipboard access
-                        prompt("Copy the following JSON data manually:", jsonString);
+                        prompt("Copy the following JSON data manually:", resultLines);
                         sEl.textContent = 'Status: Clipboard copy failed. Data ready in prompt box for manual copy.';
                         sEl.className = 'font-bold text-lg mb-4 text-secondary';
                     });
                 } else {
                     // Fallback for browsers without clipboard support
-                    prompt("Copy the following JSON data manually:", jsonString);
+                    prompt("Copy the following JSON data manually:", resultLines);
                     sEl.textContent = 'Status: Runner assignments ready in prompt box for manual copy.';
                     sEl.className = 'font-bold text-lg mb-4 text-secondary';
                 }
@@ -1505,60 +1574,119 @@
 
             }
 
-                        // Store the ID of the dragged runner
+      let selectedRunnerId = null;
+
+        function clearSelection() {
+            document.querySelectorAll('.runner-bubble').forEach(el => {
+                el.classList.remove('selected-runner');
+            });
+            selectedRunnerId = null;
+            syncData();
+        }
+
+        // --- Click-to-Move Logic ---
+        function selectRunner(ev) {
+            // Stop click event from propagating to the parent pace-group's drop/click handler
+            ev.stopPropagation();
+
+            const runnerElement = ev.target.closest('.runner-bubble');
+
+            if (!runnerElement) return;
+
+            // If the runner is already selected, unselect it
+            if (runnerElement.id === selectedRunnerId) {
+                clearSelection();
+            } else {
+                // Clear all existing selections
+                clearSelection();
+
+                // Select the new runner
+                runnerElement.classList.add('selected-runner');
+                selectedRunnerId = runnerElement.id;
+            }
+        }
+
+        // --- Drag and Drop Logic ---
+
+        // Store the ID of the dragged runner
         function drag(ev) {
+            // Clear any click selection when dragging starts
+            clearSelection();
+
             ev.dataTransfer.setData("text", ev.target.id);
-            // Optional: Add a class to the original element to make it appear 'lifted' or semi-transparent
+            // Add opacity for visual feedback
             setTimeout(() => {
                 ev.target.style.opacity = '0.4';
             }, 0);
         }
 
-        // Allow the element to be dropped
+        // Allow the element to be dropped (required for drag-and-drop)
         function allowDrop(ev) {
             ev.preventDefault();
-            // Optional: Highlight the drop zone on drag over (handled by dragEnter/dragLeave)
         }
 
         // Apply a visual cue when dragging enters a valid drop target
         function dragEnter(ev) {
-            if (ev.target.closest('.pace-group')) {
-                ev.target.closest('.pace-group').classList.add('drag-over');
+            const paceGroup = ev.target.closest('.pace-group');
+            if (paceGroup) {
+                paceGroup.classList.add('drag-over');
             }
         }
 
         // Remove the visual cue when dragging leaves the drop target
         function dragLeave(ev) {
-            if (ev.target.closest('.pace-group')) {
-                ev.target.closest('.pace-group').classList.remove('drag-over');
+            const paceGroup = ev.target.closest('.pace-group');
+            if (paceGroup) {
+                paceGroup.classList.remove('drag-over');
             }
         }
 
-        // Handle the drop event
-        function drop(ev) {
+        // Handle the drop/click-to-move event
+        function drop(ev, isClick = false) {
             ev.preventDefault();
-            const runnerId = ev.dataTransfer.getData("text");
-            const runnerElement = document.getElementById(runnerId);
+
+            let runnerElement;
+
+            if (isClick && selectedRunnerId) {
+                // Click-to-move scenario: The element to move is the selected one
+                runnerElement = document.getElementById(selectedRunnerId);
+
+                // If the click is on the runner itself, the selection logic in selectRunner handled it.
+                if (runnerElement === ev.target.closest('.runner-bubble')) {
+                    return;
+                }
+            } else if (!isClick && ev.dataTransfer.getData("text")) {
+                // Drag-and-drop scenario
+                const runnerId = ev.dataTransfer.getData("text");
+                runnerElement = document.getElementById(runnerId);
+            } else {
+                // No runner to move
+                return;
+            }
 
             // Get the drop target, ensuring it is the pace-group div
             const dropTarget = ev.target.closest('.pace-group');
-            console.log(dropTarget)
 
-            if (dropTarget) {
+            if (dropTarget && runnerElement) {
                 // Find the pace-runners container within the drop target
                 const runnerContainer = dropTarget.querySelector('.pace-runners');
 
                 if (runnerContainer) {
                     runnerContainer.appendChild(runnerElement);
-                    // Remove the opacity/visual lift from the runner element
-                    runnerElement.style.opacity = '1';
 
-                    // Remove the drop zone highlight
+                    // Cleanup for both methods
+                    runnerElement.style.opacity = '1';
                     dropTarget.classList.remove('drag-over');
 
-                    // OPTIONAL: Update runner counts (advanced, not implemented here)
-                    // You would need to iterate through all .pace-runners and update the associated .pace-count span.
+                    if (isClick) {
+                        clearSelection(); // Clear selection after a successful click-to-move
+                    }
                 }
+            } else {
+                // If drop fails, ensure drag opacity is reset
+                 if (runnerElement) {
+                     runnerElement.style.opacity = '1';
+                 }
             }
         }
 
@@ -1604,11 +1732,11 @@
                                 out_string += ", " + runner.name
                             }
 
-                            return `<span id="runner-${rId}" class="runner-bubble inline-block bg-primary/20 text-primary px-2 py-0.5 text-xs font-medium rounded-full m-0.5" draggable="true" ondragstart="drag(event)">${runner.name} (${runner.seniority})</span>`;
+                            return `<span id="runner-${rId}" class="runner-bubble inline-block bg-primary/20 text-primary px-2 py-0.5 text-xs font-medium rounded-full m-0.5" draggable="true" ondragstart="drag(event)" onclick="selectRunner(event)">${runner.name} (${runner.seniority})</span>`;
                         }).join('');
 
                         groupsListEl.innerHTML += `
-                        <div id="pace-${pace.split(' ')[0]}" class="pace-group p-4 bg-white shadow rounded-lg border-l-4 border-primary" ondragover="allowDrop(event)" ondrop="drop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)">
+                        <div id="pace-${pace.split(' ')[0]}" class="pace-group p-4 bg-white shadow rounded-lg border-l-4 border-primary" ondragover="allowDrop(event)" ondrop="drop(event)" ondragenter="dragEnter(event)" ondragleave="dragLeave(event)" onclick="drop(event, true)">
                             <p class="font-bold text-md mb-2">${pace} <span class="pace-count text-gray-500 font-normal">(${runnersInAssignment.length} runners)</span></p>
                             <div class="pace-runners flex flex-wrap">${runnersHtml}</div>
                         </div>
@@ -1641,6 +1769,17 @@
             }
             // Clean up highlights in case dragend occurred outside a drop
             document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        });
+
+        document.addEventListener('click', (ev) => {
+            // Check if the click target is a runner bubble or a pace group container
+            const isRunnerBubble = ev.target.closest('.runner-bubble');
+            const isPaceGroup = ev.target.closest('.pace-group');
+
+            // If the click is not on a runner bubble AND not on a pace group container
+            if (!isRunnerBubble && !isPaceGroup) {
+                clearSelection();
+            }
         });
             };
         </script>

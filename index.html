@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pacer Assignment Optimizer</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Pace Assigner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/javascript-lp-solver/prod/solver.js"></script>
     <script>
@@ -24,31 +26,40 @@
         }
     </script>
     <style>
-        .pace-checkbox:checked + label {
+        .pace-checkbox:checked+label {
             background-color: #4f46e5;
             color: white;
             border-color: #4f46e5;
         }
-        .success { color: #10b981; }
-        .error { color: #ef4444; }
+
+        .success {
+            color: #10b981;
+        }
+
+        .error {
+            color: #ef4444;
+        }
+
         .tab-inactive {
             background-color: #e5e7eb;
             color: #4b5563;
         }
+
         .validation-border {
-            border: 2px solid #ef4444 !important;
+            border: 1px solid #ef4444 !important;
         }
 
         /* --- Custom Responsive Table Styles --- */
-        
+
         /* Global fix for pace preference height (applies to all views) */
         .pace-container {
             /* Max height equivalent to roughly 3 lines of text-xs badges (~4.5rem/72px) */
-            max-height: 4.5rem; 
+            max-height: 4.5rem;
             overflow-y: auto;
-            padding-right: 0.5rem; /* Space for scrollbar */
+            padding-right: 0.5rem;
+            /* Space for scrollbar */
             /* Ensure the content is not wrapped and stays on the left */
-            align-items: flex-start; 
+            align-items: flex-start;
             align-content: flex-start;
         }
 
@@ -56,8 +67,9 @@
         @media (max-width: 640px) {
             #runners-table {
                 /* Ensure table takes full width but allows styling on rows */
-                display: block; 
+                display: block;
             }
+
             #runners-table thead {
                 /* Hide the table headers on mobile */
                 display: none;
@@ -73,46 +85,104 @@
                 border: 1px solid #e5e7eb;
                 border-radius: 0.75rem;
                 background-color: white;
-                position: relative; /* For absolute positioning of delete button */
+                position: relative;
+                /* For absolute positioning of delete button */
                 box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             }
-            
+
             #runners-table td {
                 display: flex;
                 align-items: center;
-                padding: 0; /* Remove default padding */
+                padding: 0;
+                /* Remove default padding */
                 border: none;
-                width: 100%; /* Ensure all cells take full card width */
+                width: 100%;
+                /* Ensure all cells take full card width */
             }
 
             /* Add labels to cells (tds) on mobile for clarity and order */
-            #runners-table td:nth-child(1) { order: -2; justify-content: flex-start; padding-bottom: 0.5rem; border-bottom: 1px solid #f3f4f6; } 
-            #runners-table td:nth-child(1) .text-sm::before { content: 'Runner #'; font-weight: 600; margin-right: 0.5rem; color: #4f46e5; }
-            
-            #runners-table td:nth-child(2) { order: 1; flex-direction: column; align-items: flex-start; }
-            #runners-table td:nth-child(2)::before { content: 'Runner Name'; font-weight: 600; margin-bottom: 0.25rem; color: #4f46e5; }
-            
-            #runners-table td:nth-child(3) { order: 2; }
-            #runners-table td:nth-child(3) input { text-align: left; }
-            #runners-table td:nth-child(3)::before { content: 'Seniority (1 = Most)'; font-weight: 600; margin-right: 0.5rem; color: #4f46e5; }
-            
-            #runners-table td:nth-child(4) { order: 3; flex-direction: column; align-items: flex-start; }
-            #runners-table td:nth-child(4)::before { content: 'Pace Preferences (min/mile)'; font-weight: 600; margin-bottom: 0.25rem; color: #4f46e5; }
-            
-            #runners-table td:nth-child(5) { order: 4; justify-content: space-between; padding-top: 0.5rem; border-top: 1px solid #f3f4f6; }
-            #runners-table td:nth-child(5) .sr-only { display: block; } /* Show Active label for mobile card */
-            
-            #runners-table td:nth-child(6) { 
-                order: -1; 
-                justify-content: flex-end; 
-                position: absolute; 
-                top: 0.5rem; 
-                right: 0.5rem; 
+            #runners-table td:nth-child(1) {
+                order: -2;
+                justify-content: flex-start;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid #f3f4f6;
+            }
+
+            #runners-table td:nth-child(1) .text-sm::before {
+                content: 'Runner #';
+                font-weight: 600;
+                margin-right: 0.5rem;
+                color: #4f46e5;
+            }
+
+            #runners-table td:nth-child(2) {
+                order: 1;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #runners-table td:nth-child(2)::before {
+                content: 'Runner Name';
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+                color: #4f46e5;
+            }
+
+            #runners-table td:nth-child(3) {
+                order: 2;
+            }
+
+            #runners-table td:nth-child(3) input {
+                text-align: left;
+            }
+
+            #runners-table td:nth-child(3)::before {
+                content: 'Seniority (1 = Most)';
+                font-weight: 600;
+                margin-right: 0.5rem;
+                color: #4f46e5;
+            }
+
+            #runners-table td:nth-child(4) {
+                order: 3;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            #runners-table td:nth-child(4)::before {
+                content: 'Pace Preferences (min/mile)';
+                font-weight: 600;
+                margin-bottom: 0.25rem;
+                color: #4f46e5;
+            }
+
+            #runners-table td:nth-child(5) {
+                order: 4;
+                justify-content: space-between;
+                padding-top: 0.5rem;
+                border-top: 1px solid #f3f4f6;
+            }
+
+            #runners-table td:nth-child(5) .sr-only {
+                display: block;
+            }
+
+            /* Show Active label for mobile card */
+
+            #runners-table td:nth-child(6) {
+                order: -1;
+                justify-content: flex-end;
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
                 width: auto;
-            } /* Delete button */
+            }
+
+            /* Delete button */
 
             /* Full width for inputs inside the card to maximize space */
-            .runner-name, .runner-seniority {
+            .runner-name,
+            .runner-seniority {
                 width: 100%;
             }
 
@@ -121,178 +191,1345 @@
                 display: none;
             }
         }
-        
+
         /* Desktop/Tablet (sm: and up) column widths (ensure good proportions) */
         @media (min-width: 641px) {
-            .runner-name-col { width: 25%; } /* More space for name */
-            .seniority-col { width: 10%; } /* Reduced space for seniority */
-            .pace-prefs-col { width: 45%; } /* Max space for paces */
-            .active-col { width: 5%; }
-            .action-col { width: 10%; }
+            .runner-name-col {
+                width: 25%;
+            }
+
+            /* More space for name */
+            .seniority-col {
+                width: 10%;
+            }
+
+            /* Reduced space for seniority */
+            .pace-prefs-col {
+                width: 45%;
+            }
+
+            /* Max space for paces */
+            .active-col {
+                width: 5%;
+            }
+
+            .action-col {
+                width: 10%;
+            }
 
             /* Ensure table cells have correct alignment on desktop */
-            #runners-table td:nth-child(2) { text-align: left; }
-            #runners-table td:nth-child(3) { text-align: center; }
-            #runners-table td:nth-child(4) { text-align: left; }
+            #runners-table td:nth-child(2) {
+                text-align: left;
+            }
+
+            #runners-table td:nth-child(3) {
+                text-align: center;
+            }
+
+            #runners-table td:nth-child(4) {
+                text-align: left;
+            }
         }
+
     </style>
 </head>
+
 <body class="bg-background min-h-screen p-4 sm:p-8 font-sans">
 
     <div class="max-w-6xl mx-auto">
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">Pacer Assignment Optimizer</h1>
-            <p class="text-gray-600">Enter runner details, then run the optimizer to find the best assignments.</p>
-        </header>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">Pace Assigner</h1>
 
+        </header>
+        <div class="text-left mb-2">
+        <p class="text-gray-600">Add runners and their preferred paces in the 'Runner Configuration' section and then hit 'Assign Paces' in the results section below. Only 'Active' runners will be assigned to a pace group.
+            <br> You can edit runners' preferences in the 'View by Runner' tab or you can make quick adjustments to each pace in the 'View by Pace' tab.
+        <br> After configuring  each runner, it may be helpful to save the settings with the 'Export Runners' button so that you can easily 'Import Runners' the next time, just be sure to save the copied text somewhere else. </p>
+        </div>
         <div class="bg-card shadow-xl rounded-xl p-6 sm:p-8 mb-8">
             <h2 class="text-2xl font-semibold text-primary mb-6 border-b pb-3">Runner Configuration</h2>
-            
+
             <div class="flex space-x-2 mb-6">
-                <button id="view-runner-tab" onclick="switchView('runner')"
+                <button id="view-runner-tab"
+                        onclick="switchView('runner')"
                         class="px-4 py-2 text-sm font-medium rounded-t-lg transition duration-150 ease-in-out bg-primary text-white">
                     View by Runner
                 </button>
-                <button id="view-pace-tab" onclick="switchView('pace')"
+                <button id="view-pace-tab"
+                        onclick="switchView('pace')"
                         class="px-4 py-2 text-sm font-medium rounded-t-lg transition duration-150 ease-in-out tab-inactive">
                     View by Pace
                 </button>
             </div>
 
             <div id="runner-view-container">
-                <p class="text-sm text-gray-600 mb-4">Runners are validated in real-time. Active runners missing a name, having a duplicate name, or missing a pace will be highlighted in red.</p>
+                <p class="text-sm text-gray-600 mb-4"></p>
                 <div class="overflow-x-auto sm:overflow-x-visible">
-                    <table id="runners-table" class="min-w-full divide-y divide-gray-200">
+                    <table id="runners-table"
+                           class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]">#</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider runner-name-col">Runner Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider seniority-col">Seniority (1 = Most)</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pace-prefs-col">Pace Preferences (min/mile)</th>
-                                <th class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider active-col">Active</th>
+                                <th
+                                    class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[5%]">
+                                    #</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider runner-name-col">
+                                    Runner Name</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider seniority-col">
+                                    Seniority (1 = Most)</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider pace-prefs-col">
+                                    Pace Preferences (min/mile)</th>
+                                <th
+                                    class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider active-col">
+                                    Active</th>
                                 <th class="px-3 py-3 action-col"></th>
                             </tr>
                         </thead>
-                        <tbody id="runners-list" class="bg-white divide-y divide-gray-200">
+                        <tbody id="runners-list"
+                               class="bg-white divide-y divide-gray-200">
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="pace-view-container" class="hidden">
-                <p class="text-sm text-gray-600 mb-4">Click "Add New Runner" to quickly assign a pace. Click the **'x'** on a runner to remove that pace preference. If a runner loses all preferences, they will be deleted.</p>
-                <div id="paces-list" class="space-y-4">
+            <div id="pace-view-container"
+                 class="hidden">
+                <p class="text-sm text-gray-600 mb-4"></p>
+                <div id="paces-list"
+                     class="space-y-4">
                 </div>
             </div>
 
             <div class="mt-6 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                <button onclick="addRunner(true)" class="w-full sm:w-auto px-6 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-secondary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition duration-150 ease-in-out">
+                <button onclick="addRunner(true)"
+                        class="w-full sm:w-auto px-6 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-secondary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition duration-150 ease-in-out">
                     Add Runner
                 </button>
-                <button onclick="exportRunners()" class="w-full sm:w-auto px-6 py-2 border border-primary text-sm font-medium rounded-lg shadow-sm text-primary bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
+                <button onclick="exportRunners()"
+                        class="w-full sm:w-auto px-6 py-2 border border-primary text-sm font-medium rounded-lg shadow-sm text-primary bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
                     Export Runners (Copy to Clipboard)
                 </button>
-                <button onclick="importRunners()" class="w-full sm:w-auto px-6 py-2 border border-primary text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
+                <button onclick="importRunners()"
+                        class="w-full sm:w-auto px-6 py-2 border border-primary text-sm font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
                     Import Runners
                 </button>
-                <button onclick="clearAllRunners()" class="w-full sm:w-auto px-6 py-2 border border-red-500 text-sm font-medium rounded-lg shadow-sm text-red-500 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
+                <button onclick="clearAllRunners()"
+                        class="w-full sm:w-auto px-6 py-2 border border-red-500 text-sm font-medium rounded-lg shadow-sm text-red-500 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out">
                     Clear All Runners
                 </button>
             </div>
         </div>
 
         <div class="bg-card shadow-xl rounded-xl p-6 sm:p-8">
-            <h2 class="text-2xl font-semibold text-primary mb-4 border-b pb-3">Optimal Assignment Results</h2>
-            <p id="status" class="font-bold text-lg mb-4 text-gray-800"></p>
-            
-            <div id="results-display" class="space-y-4">
+            <h2 class="text-2xl font-semibold text-primary mb-4 border-b pb-3">Assignment Results</h2>
+            <p id="status"
+               class="font-bold text-lg mb-4 text-gray-800"></p>
+
+            <div id="results-display"
+                 class="space-y-4">
             </div>
 
-            <button onclick="runSolver()" id="solve-button" class="mt-6 w-full sm:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
-                Run Solver
+            <button onclick="runSolver()"
+                    id="solve-button"
+                    class="mt-6 w-full sm:w-auto px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
+                Assign Paces
             </button>
 
-                <button onclick="exportAssignments()" class="w-full sm:w-auto px-6 py-2 border border-primary text-sm font-medium rounded-lg shadow-sm text-primary bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
-                    Export Assignments (Copy to Clipboard)
-                </button>
+            <button onclick="exportAssignments()"
+                    class="w-full sm:w-auto px-6 py-3 border border-primary text-base font-medium rounded-lg shadow-sm text-primary bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition duration-150 ease-in-out">
+                Export Assignments (Copy to Clipboard)
+            </button>
         </div>
-    </div>
+        <br>
+        <div class="text-left mb-8">
+            <p class="text-gray-600">Each pacer will be assigned one pace group that they listed in their preferences.
+                <br>Some pace groups may be unassigned if there are not enough pacers or if nobody said they were available.
+                </p>
+                <p class="text-gray-600 py-1">The optimizer has 3 objectives which it will fulfill in order:</p>
+            <ol class="text-gray-600 list-decimal px-8">
+                <li>
+                    Avoid large groups, spread the pacers out as evenly as possible
+                </li>
+                <li>
+                    If multiple configurations are possible, assign a pacer to their fastest possible pace
+                </li>
+                <li>
+                    If there are still multiple configurations possible, pacers will be assigned to their fastest pace in order of seniority
+                </li>
+            </ol>
+            <p class="text-gray-600 py-1">Trhe optimizer has 3 objectives which it will fulfill in orde:</p>
+        </div>
 
-    <script>
-        const PACES=["7:00 min/mile","7:30 min/mile","8:00 min/mile","8:30 min/mile","9:00 min/mile","9:30 min/mile","10:00 min/mile","10:30 min/mile","11:00 min/mile"];let R={},result_string="",rCount=0,currentView="runner",inputChanged=!1,hasEverSolved=!1,editingState={pace:null,runnerId:null};const sEl=document.getElementById("status"),resEl=document.getElementById("results-display"),solBtn=document.getElementById("solve-button");function genId(){return"undefined"!=typeof crypto&&crypto.randomUUID?crypto.randomUUID():`r${++rCount}`}function setBtnState(e){solBtn.disabled=!e,e?solBtn.classList.remove("opacity-50","cursor-not-allowed"):solBtn.classList.add("opacity-50","cursor-not-allowed")}function markChanged(){inputChanged&&(hasEverSolved||"Status: Ready to configure runners and solve."===sEl.textContent)||(inputChanged=!0,setBtnState(!0),hasEverSolved?(sEl.textContent="Status: Input changed. Run solver again.",sEl.className="font-bold text-lg mb-4 text-secondary"):(sEl.textContent="Status: Ready to configure runners and solve.",sEl.className="font-bold text-lg mb-4 text-gray-800"))}function findDups(){let e=Object.values(R).filter(e=>e.active&&e.name.trim()),t={};e.forEach(e=>{let n=e.name.trim().toLowerCase();t[n]=t[n]||[],t[n].push(e.id)});let n=new Set;for(let r in t)t[r].length>1&&t[r].forEach(e=>n.add(e));return n}function createNewRunnerInData(e="",t=null,n=[],r=!0){let a=genId();return R[a]={id:a,name:e,seniority:null!==t?t:Object.keys(R).length+1,paces:n,active:r},markChanged(),a}function addRunner(e=!0){let t=createNewRunnerInData();if(e){if("runner"===currentView){renderRView();let n=document.getElementById(`runner-row-${t}`);n&&n.scrollIntoView({behavior:"smooth",block:"center"})}else renderPView()}}function updateRunnerData(e,t,n){R[e]&&!("seniority"===t&&isNaN(n))&&(R[e][t]=n,markChanged())}function deleteRunner(e){R[e]&&(delete R[e],"runner"===currentView?renderRView():(editingState.runnerId===e&&(editingState={pace:null,runnerId:null}),renderPView()),markChanged())}function clearAllRunners(e=!1){R={},editingState={pace:null,runnerId:null},rCount=0,inputChanged=!0,hasEverSolved=!1,resEl.innerHTML="",e||addRunner(!1),"runner"===currentView?renderRView():renderPView(),sEl.textContent="Status: All runners cleared. A new row has been added.",sEl.className="font-bold text-lg mb-4 text-gray-800",setBtnState(!0)}function removePaceFromRunner(e,t){if(!R[e])return;let n=R[e],r=n.paces.length;if(n.paces=n.paces.filter(e=>e!==t),0===n.paces.length){let a=n.name||"Untitled Runner";delete R[e],sEl.textContent=`Status: Runner '${a}' deleted because they had no remaining pace preferences.`,sEl.className="success font-bold text-lg mb-4"}else{if(!(n.paces.length<r))return;sEl.textContent=`Status: Removed ${t} preference from ${n.name||"Untitled Runner"}.`,sEl.className="font-bold text-lg mb-4 text-gray-800"}markChanged(),renderPView(),setTimeout(()=>markChanged(),3e3)}function startAddingRunner(e){editingState.runnerId&&delete R[editingState.runnerId];let t=createNewRunnerInData("",null,[e],!0);editingState={pace:e,runnerId:t},renderPView();let n=document.getElementById(`new-runner-input-${t}`);n&&setTimeout(()=>n.focus(),0)}function finalizeNewRunnerName(e,t,n){if(editingState.runnerId!==t)return;if(!(n=n.trim())){delete R[t],editingState={pace:null,runnerId:null},renderPView(),sEl.textContent="Error: Runner creation cancelled. Name cannot be blank.",sEl.className="error font-bold text-lg mb-4",setTimeout(()=>markChanged(),2e3);return}let r=n.toLowerCase(),a=null;for(let s in R)if(s!==t&&R[s].name.toLowerCase()===r){a=s;break}if(a){let l=R[a];l.paces.includes(e)?(sEl.textContent=`Status: Runner '${l.name}' already prefers ${e}.`,sEl.className="font-bold text-lg mb-4 text-gray-800"):(l.paces.push(e),sEl.textContent=`Status: Pace preference added to existing runner '${l.name}'!`,sEl.className="success font-bold text-lg mb-4"),delete R[t]}else R[t].name=n,null===R[t].seniority&&(R[t].seniority=Object.keys(R).length),sEl.textContent=`Status: New runner '${n}' created and assigned to ${e}.`,sEl.className="success font-bold text-lg mb-4";editingState={pace:null,runnerId:null},renderPView(),markChanged(),setTimeout(()=>markChanged(),3e3)}function handleNewRunnerNameInput(e,t,n){if("Enter"!==e.key)return;e.preventDefault();let r=e.target.value;finalizeNewRunnerName(t,n,r)}function handleNewRunnerNameBlur(e,t){if(editingState.runnerId!==t)return;let n=document.getElementById(`new-runner-input-${t}`);if(!n)return;let r=n.value;finalizeNewRunnerName(e,t,r)}function renderPView(){let e=document.getElementById("paces-list");e.innerHTML="";let t=Object.values(R);if(PACES.forEach(n=>{let r=t.filter(e=>e.paces.includes(n)&&e.id!==editingState.runnerId),a=r.sort((e,t)=>e.seniority-t.seniority),s=a.map(e=>e.active?`<span class="inline-flex items-center bg-primary/20 text-primary px-2 py-0.5 text-xs font-medium rounded-full m-0.5 whitespace-nowrap">
-                        <span>${e.name||"Untitled Runner"} (${e.seniority})</span>
-                        <button onclick="removePaceFromRunner('${e.id}', '${n}')" title="Remove ${n} preference from ${e.name}" class="ml-1 text-primary/70 hover:text-red-600 transition duration-150 p-0.5 rounded-full hover:bg-white/50 leading-none focus:outline-none focus:ring-2 focus:ring-primary/50">
+        <script>
+            // Global Constants and State
+            const PACES = [
+                '7:00 min/mile', '7:30 min/mile', '8:00 min/mile', '8:30 min/mile', '9:00 min/mile',
+                '9:30 min/mile', '10:00 min/mile', '10:30 min/mile', '11:00 min/mile'
+            ];
+            let R = {}; // Runner data store: { runnerId: { id, name, seniority, paces, active } }
+            let result_string = '' // Runner data final
+            let rCount = 0; // Counter for fallback ID generation
+            let currentView = 'runner'; // 'runner' or 'pace'
+            let inputChanged = false; // Flag to check if inputs have changed since last solve
+            let hasEverSolved = false; // Flag to track if the solver has ever run successfully
+            let editingState = { pace: null, runnerId: null }; // State for adding a new runner in Pace View
+
+            // DOM Element references
+            const sEl = document.getElementById('status');
+            const resEl = document.getElementById('results-display');
+            const solBtn = document.getElementById('solve-button');
+
+            /**
+             * Generates a unique runner ID, using crypto.randomUUID if available,
+             * otherwise falling back to a counter-based ID.
+             * @returns {string} The unique ID.
+             */
+            function genId() {
+                return (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `r${++rCount}`;
+            }
+
+            /**
+             * Sets the disabled state of the 'Run Assigner' button.
+             * @param {boolean} enable True to enable, false to disable.
+             */
+            function setBtnState(enable) {
+                solBtn.disabled = !enable;
+                if (enable) {
+                    solBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    solBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+
+            /**
+             * Marks the application state as changed, enabling the solver button and updating status.
+             */
+            function markChanged() {
+                // Only update if it's the first change or if we were previously solved/ready
+                if (!inputChanged || (!hasEverSolved && sEl.textContent !== 'Status: Ready to configure runners and solve.')) {
+                    inputChanged = true;
+                    setBtnState(true);
+
+                    if (hasEverSolved) {
+                        sEl.textContent = 'Status: Input changed. Run solver again.';
+                        sEl.className = 'font-bold text-lg mb-4 text-secondary';
+                    } else {
+                        sEl.textContent = 'Status: Ready to configure runners and solve.';
+                        sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+                    }
+                }
+            }
+
+            /**
+             * Finds all active runners that have duplicate names (case-insensitive, trimmed).
+             * @returns {Set<string>} A set of runner IDs that have duplicate names.
+             */
+            function findDups() {
+                const activeRunners = Object.values(R).filter(r => r.active && r.name.trim());
+                const namesCount = {};
+                activeRunners.forEach(r => {
+                    const normalizedName = r.name.trim().toLowerCase();
+                    namesCount[normalizedName] = namesCount[normalizedName] || [];
+                    namesCount[normalizedName].push(r.id);
+                });
+
+                const duplicateIds = new Set();
+                for (const name in namesCount) {
+                    if (namesCount[name].length > 1) {
+                        namesCount[name].forEach(id => duplicateIds.add(id));
+                    }
+                }
+                return duplicateIds;
+            }
+
+            /**
+             * Creates a new runner object in the global data store R.
+             * @param {string} name Runner's name.
+             * @param {number|null} seniority Runner's seniority.
+             * @param {string[]} paces Array of preferred paces.
+             * @param {boolean} active Active status.
+             * @returns {string} The new runner's ID.
+             */
+            function createNewRunnerInData(name = '', seniority = null, paces = [], active = true) {
+                const id = genId();
+                R[id] = {
+                    id: id,
+                    name: name,
+                    seniority: seniority !== null ? seniority : Object.keys(R).length + 1,
+                    paces: paces,
+                    active: active
+                };
+                markChanged();
+                return id;
+            }
+
+            /**
+             * Adds a new runner row to the view.
+             * @param {boolean} shouldRender If true, re-renders the current view and scrolls to the new runner.
+             */
+            function addRunner(shouldRender = true) {
+                const id = createNewRunnerInData();
+                if (shouldRender) {
+                    if (currentView === 'runner') {
+                        renderRView();
+                        const newRow = document.getElementById(`runner-row-${id}`);
+                        if (newRow) newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        renderPView();
+                    }
+                }
+            }
+
+            /**
+             * Updates a specific field for a runner in the data store.
+             * @param {string} id Runner ID.
+             * @param {string} field Field to update ('name', 'seniority', 'active', 'paces').
+             * @param {*} value The new value.
+             */
+            function updateRunnerData(id, field, value) {
+                if (R[id]) {
+                    // Basic validation for seniority
+                    if (field === 'seniority' && isNaN(value)) return;
+                    R[id][field] = value;
+                    markChanged();
+                }
+            }
+
+            /**
+             * Deletes a runner from the data store and re-renders the current view.
+             * @param {string} runnerId The ID of the runner to delete.
+             */
+            function deleteRunner(runnerId) {
+                if (R[runnerId]) {
+                    delete R[runnerId];
+                    if (currentView === 'runner') {
+                        renderRView();
+                    } else {
+                        // Clear editing state if the deleted runner was being edited in pace view
+                        if (editingState.runnerId === runnerId) {
+                            editingState = { pace: null, runnerId: null };
+                        }
+                        renderPView();
+                    }
+                    markChanged();
+                }
+            }
+
+            /**
+             * Clears all runner data and resets state.
+             * @param {boolean} skipNewRow If true, doesn't add the default initial row.
+             */
+            function clearAllRunners(skipNewRow = false) {
+                R = {};
+                editingState = { pace: null, runnerId: null };
+                rCount = 0;
+                inputChanged = true;
+                hasEverSolved = false;
+                resEl.innerHTML = '';
+
+                if (!skipNewRow) {
+                    addRunner(false); // Add a blank one for convenience, but don't force render
+                }
+
+                if (currentView === 'runner') {
+                    renderRView();
+                } else {
+                    renderPView();
+                }
+
+                sEl.textContent = 'Status: All runners cleared. A new row has been added.';
+                sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+                setBtnState(true);
+            }
+
+            // --- Pace View Functions ---
+
+            /**
+             * Removes a pace preference from a runner. Deletes the runner if no paces remain.
+             * @param {string} rId Runner ID.
+             * @param {string} paceToRemove Pace string to remove.
+             */
+            function removePaceFromRunner(rId, paceToRemove) {
+                if (!R[rId]) return;
+                const runner = R[rId];
+                const initialPaceCount = runner.paces.length;
+
+                runner.paces = runner.paces.filter(p => p !== paceToRemove);
+
+                if (runner.paces.length === 0) {
+                    // Delete runner if they have no paces left
+                    const deletedName = runner.name || 'Untitled Runner';
+                    delete R[rId];
+                    sEl.textContent = `Status: Runner '${deletedName}' deleted because they had no remaining pace preferences.`;
+                    sEl.className = 'success font-bold text-lg mb-4';
+                } else if (runner.paces.length < initialPaceCount) {
+                    sEl.textContent = `Status: Removed ${paceToRemove} preference from ${runner.name || 'Untitled Runner'}.`;
+                    sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+                } else {
+                    return; // Nothing changed
+                }
+
+                markChanged();
+                renderPView();
+                setTimeout(() => markChanged(), 3000); // Re-flag as changed after status update
+            }
+
+            /**
+             * Starts the process of adding a new runner in the Pace View.
+             * @param {string} pace The pace to pre-assign to the new runner.
+             */
+            function startAddingRunner(pace) {
+                // If we were editing another new runner, delete them before starting a new one
+                if (editingState.runnerId) {
+                    delete R[editingState.runnerId];
+                }
+
+                // Create a temporary, unnamed runner object
+                const newRunnerId = createNewRunnerInData('', null, [pace], true);
+                editingState = { pace: pace, runnerId: newRunnerId };
+                renderPView();
+
+                // Focus the input field
+                const inputEl = document.getElementById(`new-runner-input-${newRunnerId}`);
+                if (inputEl) setTimeout(() => inputEl.focus(), 0);
+            }
+
+            /**
+             * Finalizes the new runner creation in Pace View (called on Enter or Blur).
+             * @param {string} pace The pace being assigned.
+             * @param {string} runnerId The ID of the temporary runner object.
+             * @param {string} name The entered runner name.
+             */
+            function finalizeNewRunnerName(pace, runnerId, name) {
+                if (editingState.runnerId !== runnerId) return;
+
+                name = name.trim();
+
+                if (!name) {
+                    // Name is blank, cancel creation
+                    delete R[runnerId];
+                    editingState = { pace: null, runnerId: null };
+                    renderPView();
+                    sEl.textContent = "Error: Runner creation cancelled. Name cannot be blank.";
+                    sEl.className = 'error font-bold text-lg mb-4';
+                    setTimeout(() => markChanged(), 2000);
+                    return;
+                }
+
+                const normalizedName = name.toLowerCase();
+                let existingRunnerId = null;
+
+                // Check if runner with this name already exists
+                for (const id in R) {
+                    if (id !== runnerId && R[id].name.toLowerCase() === normalizedName) {
+                        existingRunnerId = id;
+                        break;
+                    }
+                }
+
+                if (existingRunnerId) {
+                    // Found existing runner: assign pace to them and delete the temporary one
+                    const existingRunner = R[existingRunnerId];
+                    if (!existingRunner.paces.includes(pace)) {
+                        existingRunner.paces.push(pace);
+                        sEl.textContent = `Status: Pace preference added to existing runner '${existingRunner.name}'!`;
+                        sEl.className = 'success font-bold text-lg mb-4';
+                    } else {
+                        sEl.textContent = `Status: Runner '${existingRunner.name}' already prefers ${pace}.`;
+                        sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+                    }
+                    delete R[runnerId];
+                } else {
+                    // New runner: finalize name and set seniority
+                    R[runnerId].name = name;
+                    if (R[runnerId].seniority === null) {
+                        R[runnerId].seniority = Object.keys(R).length;
+                    }
+                    sEl.textContent = `Status: New runner '${name}' created and assigned to ${pace}.`;
+                    sEl.className = 'success font-bold text-lg mb-4';
+                }
+
+                // Reset editing state and re-render
+                editingState = { pace: null, runnerId: null };
+                renderPView();
+                markChanged();
+                setTimeout(() => markChanged(), 3000); // Re-flag as changed after status update
+            }
+
+            /**
+             * Handles the keydown event on the new runner name input in Pace View.
+             * @param {Event} e Keydown event.
+             * @param {string} pace Pace string.
+             * @param {string} rId Runner ID.
+             */
+            function handleNewRunnerNameInput(e, pace, rId) {
+                if (e.key !== 'Enter') return;
+                e.preventDefault();
+                const name = e.target.value;
+                finalizeNewRunnerName(pace, rId, name);
+            }
+
+            /**
+             * Handles the blur event on the new runner name input in Pace View.
+             * @param {string} pace Pace string.
+             * @param {string} rId Runner ID.
+             */
+            function handleNewRunnerNameBlur(pace, rId) {
+                if (editingState.runnerId !== rId) return;
+                const inputEl = document.getElementById(`new-runner-input-${rId}`);
+                if (!inputEl) return;
+                const name = inputEl.value;
+                finalizeNewRunnerName(pace, rId, name);
+            }
+
+            /**
+             * Renders the Pace View (paces-list).
+             */
+            function renderPView() {
+                const pacesListEl = document.getElementById('paces-list');
+                pacesListEl.innerHTML = '';
+                const allRunners = Object.values(R);
+
+                PACES.forEach(pace => {
+                    // Filter runners for this pace, excluding the temp runner if currently editing
+                    const runnersInPace = allRunners.filter(r => r.paces.includes(pace) && r.id !== editingState.runnerId);
+                    const sortedRunners = runnersInPace.sort((a, b) => a.seniority - b.seniority);
+
+                    const runnersHtml = sortedRunners.map(r => {
+                        if (!r.active) return '';
+                        return `<span class="inline-flex items-center bg-primary/20 text-primary px-2 py-0.5 text-xs font-medium rounded-full m-0.5 whitespace-nowrap">
+                        <span>${r.name || 'Untitled Runner'} (${r.seniority})</span>
+                        <button onclick="removePaceFromRunner('${r.id}', '${pace}')" title="Remove ${pace} preference from ${r.name}" class="ml-1 text-primary/70 hover:text-red-600 transition duration-150 p-0.5 rounded-full hover:bg-white/50 leading-none focus:outline-none focus:ring-2 focus:ring-primary/50">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
-                    </span>`:"").join(""),l=editingState.pace===n,i=l?R[editingState.runnerId]:null;e.innerHTML+=`
+                    </span>`;
+                    }).join('');
+
+                    const isEditingThisPace = editingState.pace === pace;
+                    const editingRunner = isEditingThisPace ? R[editingState.runnerId] : null;
+
+                    pacesListEl.innerHTML += `
                     <div class="p-4 bg-white shadow rounded-lg border-l-4 border-secondary flex flex-col justify-between items-start">
                         <div class="w-full flex justify-between items-start sm:items-center flex-col sm:flex-row mb-3">
-                            <p class="font-bold text-lg mb-2 sm:mb-0">${n} <span class="text-gray-500 font-normal text-sm">(${r.filter(e=>e.active).length} active runners)</span></p>
-                            ${l?"":`
-                                <button onclick="startAddingRunner('${n}')" class="px-4 py-2 border border-transparent text-xs font-medium rounded-lg shadow-sm text-white bg-secondary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition duration-150 ease-in-out whitespace-nowrap">
+                            <p class="font-bold text-lg mb-2 sm:mb-0">${pace} <span class="text-gray-500 font-normal text-sm">(${runnersInPace.filter(r => r.active).length} active runners)</span></p>
+                            ${!isEditingThisPace ? `
+                                <button onclick="startAddingRunner('${pace}')" class="px-4 py-2 border border-transparent text-xs font-medium rounded-lg shadow-sm text-white bg-secondary hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition duration-150 ease-in-out whitespace-nowrap">
                                     Add New Runner to this Pace
-                                </button>`}
+                                </button>` : ''}
                         </div>
                         <div class="flex flex-wrap min-h-[2rem] w-full">
-                            ${s.length>0?s:'<span class="text-gray-400 text-sm">No runners currently prefer this pace.</span>'}
-                            ${l&&i?`
-                                <input type="text" id="new-runner-input-${i.id}" placeholder="Enter runner name and press Enter or blur"
-                                    onkeydown="handleNewRunnerNameInput(event, '${n}', '${i.id}')"
-                                    onblur="handleNewRunnerNameBlur('${n}', '${i.id}')"
+                            ${runnersHtml.length > 0 ? runnersHtml : '<span class="mt-1 text-gray-400 text-sm">No runners currently prefer this pace.</span>'}
+                            ${isEditingThisPace && editingRunner ? `
+                                <input type="text" id="new-runner-input-${editingRunner.id}" placeholder="Enter runner name and press Enter or blur"
+                                    onkeydown="handleNewRunnerNameInput(event, '${pace}', '${editingRunner.id}')"
+                                    onblur="handleNewRunnerNameBlur('${pace}', '${editingRunner.id}')"
                                     class="w-full sm:w-80 p-2 border border-primary rounded-lg text-sm focus:ring-primary focus:border-primary shadow-md">
-                            `:""}
+                            ` : ''}
                         </div>
                     </div>
-                `}),editingState.runnerId){let n=document.getElementById(`new-runner-input-${editingState.runnerId}`);n&&setTimeout(()=>n.focus(),0)}}function switchView(e){"runner"===currentView?syncData():"pace"===currentView&&editingState.runnerId&&(delete R[editingState.runnerId],editingState={pace:null,runnerId:null}),currentView=e;let t=document.getElementById("runner-view-container"),n=document.getElementById("pace-view-container"),r=document.getElementById("view-runner-tab"),a=document.getElementById("view-pace-tab");"runner"===e?(t.classList.remove("hidden"),n.classList.add("hidden"),renderRView(),r.classList.remove("tab-inactive"),r.classList.add("bg-primary","text-white"),a.classList.remove("bg-primary","text-white"),a.classList.add("tab-inactive")):"pace"===e&&(t.classList.add("hidden"),n.classList.remove("hidden"),renderPView(),a.classList.remove("tab-inactive"),a.classList.add("bg-primary","text-white"),r.classList.remove("bg-primary","text-white"),r.classList.add("tab-inactive"))}function getRunnerElements(e){let t=document.getElementById(`runner-row-${e}`);return t?{nameInput:t.querySelector(".runner-name"),paceContainer:t.querySelector(".pace-container")}:null}function validateRow(e,t){let n=R[e],r=getRunnerElements(e);if(!r||!n)return;let{nameInput:a,paceContainer:s}=r;if(a.classList.remove("validation-border"),s.classList.remove("validation-border"),n.active){if(t.has(e)||!n.name.trim()){a.classList.add("validation-border");return}0===n.paces.length&&s.classList.add("validation-border")}}function generatePaceCheckboxes(e,t){return PACES.map(n=>`
-                <input type="checkbox" id="pace-${e}-${n.replace(/[:\/ ]/g,"-")}" data-pace="${n}"
-                    class="pace-checkbox hidden" value="${n}" data-runner-id="${e}"
-                    ${t.includes(n)?"checked":""}>
-                <label for="pace-${e}-${n.replace(/[:\/ ]/g,"-")}"
+                `;
+                });
+
+                // Re-focus the input field after rendering if in editing state
+                if (editingState.runnerId) {
+                    const inputEl = document.getElementById(`new-runner-input-${editingState.runnerId}`);
+                    if (inputEl) setTimeout(() => inputEl.focus(), 0);
+                }
+            }
+
+            // --- View Switching ---
+
+            /**
+             * Switches the configuration view between 'runner' and 'pace'.
+             * @param {string} viewName 'runner' or 'pace'.
+             */
+            function switchView(viewName) {
+                // Before switching away from the current view, sync data or clean up temp state
+                if (currentView === 'runner') {
+                    syncData();
+                } else if (currentView === 'pace') {
+                    // Clean up temporary runner if one was being added
+                    if (editingState.runnerId) {
+                        delete R[editingState.runnerId];
+                        editingState = { pace: null, runnerId: null };
+                    }
+                }
+
+                currentView = viewName;
+                const runnerViewContainer = document.getElementById('runner-view-container');
+                const paceViewContainer = document.getElementById('pace-view-container');
+                const runnerViewTab = document.getElementById('view-runner-tab');
+                const paceViewTab = document.getElementById('view-pace-tab');
+
+                if (viewName === 'runner') {
+                    runnerViewContainer.classList.remove('hidden');
+                    paceViewContainer.classList.add('hidden');
+                    renderRView();
+                    runnerViewTab.classList.remove('tab-inactive');
+                    runnerViewTab.classList.add('bg-primary', 'text-white');
+                    paceViewTab.classList.remove('bg-primary', 'text-white');
+                    paceViewTab.classList.add('tab-inactive');
+                } else if (viewName === 'pace') {
+                    runnerViewContainer.classList.add('hidden');
+                    paceViewContainer.classList.remove('hidden');
+                    renderPView();
+                    paceViewTab.classList.remove('tab-inactive');
+                    paceViewTab.classList.add('bg-primary', 'text-white');
+                    runnerViewTab.classList.remove('bg-primary', 'text-white');
+                    runnerViewTab.classList.add('tab-inactive');
+                }
+            }
+
+            // --- Runner View Functions ---
+
+            /**
+             * Helper to get relevant DOM elements for a runner row.
+             * @param {string} rId Runner ID.
+             * @returns {object|null} Object containing input elements, or null if not found.
+             */
+            function getRunnerElements(rId) {
+                const row = document.getElementById(`runner-row-${rId}`);
+                if (!row) return null;
+                return {
+                    nameInput: row.querySelector('.runner-name'),
+                    paceContainer: row.querySelector('.pace-container'),
+                };
+            }
+
+            /**
+             * Validates a single runner row's inputs and applies error styling.
+             * @param {string} rId Runner ID.
+             * @param {Set<string>} duplicateIds Set of runner IDs that have duplicate names.
+             */
+            function validateRow(rId, duplicateIds) {
+                const runner = R[rId];
+                const elements = getRunnerElements(rId);
+                if (!elements || !runner) return;
+
+                const { nameInput, paceContainer } = elements;
+
+                // Reset validation styles
+                nameInput.classList.remove('validation-border');
+                paceContainer.classList.remove('validation-border');
+
+                // Only validate active runners
+                if (!runner.active) return;
+
+                // 1. Check for duplicates
+                if (duplicateIds.has(rId)) {
+                    nameInput.classList.add('validation-border');
+                    return;
+                }
+
+                // 2. Check for missing name
+                if (!runner.name.trim()) {
+                    nameInput.classList.add('validation-border');
+                    return;
+                }
+
+                // 3. Check for missing pace preference
+                if (runner.paces.length === 0) {
+                    paceContainer.classList.add('validation-border');
+                }
+            }
+
+            /**
+             * Generates the HTML for pace selection checkboxes for a runner.
+             * @param {string} rId Runner ID.
+             * @param {string[]} currentPaces Array of paces currently preferred.
+             * @returns {string} HTML string for pace checkboxes.
+             */
+            function generatePaceCheckboxes(rId, currentPaces) {
+                return PACES.map(pace => `
+                <input type="checkbox" id="pace-${rId}-${pace.replace(/[:\/ ]/g, '-')}" data-pace="${pace}"
+                    class="pace-checkbox hidden" value="${pace}" data-runner-id="${rId}"
+                    ${currentPaces.includes(pace) ? 'checked' : ''}>
+                <label for="pace-${rId}-${pace.replace(/[:\/ ]/g, '-')}"
                     class="inline-block px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-full cursor-pointer
                     hover:bg-gray-200 transition duration-150 ease-in-out m-0.5 whitespace-nowrap">
-                    ${n.split(" ")[0]}
+                    ${pace.split(' ')[0]}
                 </label>
-            `).join("")}function renderRRow(e,t){let n=document.createElement("tr");return n.id=`runner-row-${e.id}`,n.className="runner-row hover:bg-gray-50 transition duration-150 relative",n.innerHTML=`
+            `).join('');
+            }
+
+            /**
+             * Creates and returns a single runner table row element.
+             * @param {object} runner The runner data object.
+             * @param {number} index The index of the runner in the list (for # column).
+             * @returns {HTMLElement} The created table row.
+             */
+            function renderRRow(runner, index) {
+                const row = document.createElement('tr');
+                row.id = `runner-row-${runner.id}`;
+                row.className = 'runner-row hover:bg-gray-50 transition duration-150 relative'; // Added relative for mobile delete button
+                row.innerHTML = `
                 <td class="px-3 py-3 whitespace-nowrap">
-                    <span class="text-sm text-gray-500">${t+1}</span>
+                    <span class="text-sm text-gray-500">${index + 1}</span>
                 </td>
                 <td class="px-6 py-3">
-                    <input type="text" placeholder="e.g., Jane Doe" required value="${e.name}" data-runner-id="${e.id}"
+                    <input type="text" placeholder="Runner Name" required value="${runner.name}" data-runner-id="${runner.id}"
                         class="runner-name w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary">
                 </td>
                 <td class="px-6 py-3 whitespace-nowrap">
-                    <input type="number" value="${e.seniority}" min="1" required data-runner-id="${e.id}"
+                    <input type="number" value="${runner.seniority}" min="1" required data-runner-id="${runner.id}"
                         class="runner-seniority w-full sm:w-20 p-2 border border-gray-300 rounded-lg text-sm text-center focus:ring-primary focus:border-primary">
                 </td>
                 <td class="px-6 py-3">
-                    <div id="pace-container-${e.id}" class="pace-container flex flex-wrap space-x-1 p-1 border border-transparent rounded-lg transition duration-150 ease-in-out">
-                        ${generatePaceCheckboxes(e.id,e.paces)}
+                    <div id="pace-container-${runner.id}" class="pace-container flex flex-wrap space-x-1 p-1 border border-transparent rounded-lg transition duration-150 ease-in-out">
+                        ${generatePaceCheckboxes(runner.id, runner.paces)}
                     </div>
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap">
                     <div class="flex justify-center sm:justify-start items-center h-full">
                         <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" ${e.active?"checked":""} class="sr-only peer runner-active-toggle" data-runner-id="${e.id}">
+                            <input type="checkbox" ${runner.active ? 'checked' : ''} class="sr-only peer runner-active-toggle" data-runner-id="${runner.id}">
                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/40 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                             <span class="ml-3 text-sm font-medium text-gray-900 sr-only">Active Toggle</span>
                         </label>
                     </div>
                 </td>
                 <td class="px-3 py-3 whitespace-nowrap">
-                    <button onclick="deleteRunner('${e.id}')" class="p-2 text-red-500 hover:text-red-700 rounded-full transition duration-150">
+                    <button onclick="deleteRunner('${runner.id}')" class="p-2 text-red-500 hover:text-red-700 rounded-full transition duration-150">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 10-2 0v6a1 1 0 102 0V8z" clip-rule="evenodd" />
                         </svg>
                     </button>
                 </td>
-            `,n}function renderRView(){let e=document.getElementById("runners-list");e.innerHTML="";let t=Object.values(R).sort((e,t)=>e.seniority-t.seniority),n=findDups();t.forEach((t,r)=>{let a=renderRRow(t,r);e.appendChild(a),validateRow(t.id,n)}),setupRListeners()}function setupRListeners(){let e=document.getElementById("runners-list");e.removeEventListener("change",handleRInput),e.removeEventListener("input",handleRInput),e.addEventListener("change",handleRInput),e.addEventListener("input",handleRInput)}function handleRInput(e){let t=e.target,n=t.dataset.runnerId;if(!R[n])return;if(t.classList.contains("runner-name"))updateRunnerData(n,"name",t.value.trim());else if(t.classList.contains("runner-seniority"))updateRunnerData(n,"seniority",parseInt(t.value));else if(t.classList.contains("runner-active-toggle"))updateRunnerData(n,"active",t.checked);else if(t.classList.contains("pace-checkbox")){let r=R[n],a=r.paces,s=t.getAttribute("data-pace");if(t.checked)a.includes(s)||a.push(s);else{let l=a.indexOf(s);l>-1&&a.splice(l,1)}r.paces=a}let i=findDups();t.classList.contains("runner-name")||t.classList.contains("runner-active-toggle")?Object.keys(R).forEach(e=>{validateRow(e,i)}):validateRow(n,i),markChanged()}function syncData(){if("pace"===currentView)return;let e=document.querySelectorAll(".runner-row"),t=findDups();e.forEach(e=>{let n=e.id.replace("runner-row-","");if(!R[n])return;let r=e.querySelector(".runner-name"),a=e.querySelector(".runner-seniority"),s=e.querySelector(".runner-active-toggle"),l=e.querySelectorAll(".pace-checkbox"),i=Array.from(l).filter(e=>e.checked).map(e=>e.getAttribute("data-pace"));R[n].name=r.value.trim(),R[n].seniority=parseInt(a.value)||1,R[n].paces=i,R[n].active=s.checked,validateRow(n,t)})}function exportRunners(){syncData();let e=Object.values(R).filter(e=>e.name).map(e=>({name:e.name,seniority:e.seniority,paces:e.paces,active:e.active})),t=JSON.stringify(e,null,2);navigator.clipboard?navigator.clipboard.writeText(t).then(()=>{sEl.textContent="Status: Runner data copied to clipboard as JSON!",sEl.className="success font-bold text-lg mb-4"}).catch(e=>{console.error("Failed to copy text: ",e),prompt("Copy the following JSON data manually:",t),sEl.textContent="Status: Clipboard copy failed. Data ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary"}):(prompt("Copy the following JSON data manually:",t),sEl.textContent="Status: Runner data ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary")}function exportAssignments(){syncData();let e=result_string;navigator.clipboard?navigator.clipboard.writeText(e).then(()=>{sEl.textContent="Status: Runner assignments copied to clipboard!",sEl.className="success font-bold text-lg mb-4"}).catch(t=>{console.error("Failed to copy text: ",t),prompt("Copy the following JSON data manually:",e),sEl.textContent="Status: Clipboard copy failed. Data ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary"}):(prompt("Copy the following JSON data manually:",e),sEl.textContent="Status: Runner assignments ready in prompt box for manual copy.",sEl.className="font-bold text-lg mb-4 text-secondary")}function importRunners(){let e=prompt("Paste the JSON string containing runner data here:");if(!e){sEl.textContent="Status: Import cancelled.",sEl.className="font-bold text-lg mb-4 text-gray-800";return}try{let t=JSON.parse(e);if(!Array.isArray(t)||t.some(e=>"object"!=typeof e||void 0===e.name||void 0===e.seniority))throw Error("Invalid JSON structure. Expected an array of runner objects with 'name' and 'seniority' fields.");clearAllRunners(!0),t.forEach(e=>{createNewRunnerInData(e.name,e.seniority,e.paces||[],void 0===e.active||e.active)}),"runner"===currentView?renderRView():renderPView(),markChanged(),window.scrollTo({top:0,behavior:"smooth"}),sEl.textContent=`Status: Successfully imported ${t.length} runners. Run the solver to get assignments.`,sEl.className="success font-bold text-lg mb-4"}catch(n){console.error("Import Error:",n),sEl.textContent=`Error: Failed to import data. ${n.message||"Invalid JSON format."}`,sEl.className="error font-bold text-lg mb-4"}}function generatePaceGroups(){let e={};for(let t=14;t<=22;t++){let n=t/2,r=Math.floor(n),a=Math.round((n-r)*60),s=`${r}:${a.toString().padStart(2,"0")} min/mile`;e[s]=n}return e}function solveAssignmentProblem(e){let t=generatePaceGroups(),n=Object.keys(t),r={...t},a=Math.max(...Object.values(r)),s=Object.keys(e);if(0===s.length)return{error:"No active runners provided for assignment."};let l={},i={};s.forEach(t=>{l[t]=e[t].paces,i[t]=e[t].seniority});let o=s.sort((e,t)=>{let n=i[e]-i[t];return 0!==n?n:e.localeCompare(t)}),d=Math.max(...Object.values(i)),u=Object.fromEntries(o.map(e=>[e,d+1-i[e]])),c=Object.fromEntries(n.map(e=>[e,a-r[e]])),m={};for(let p of o)for(let f of n){let g=l[p].includes(f);m[`${p}|${f}`]=g?u[p]*c[f]*1e-6:0}let $={};for(let b of o)for(let h of n)$[`${b}|${h}`]=l[b].includes(h)?1:0;let y={optimize:"range",opType:"min",constraints:{},variables:{},ints:{}};y.variables.Z_max={range:1},y.variables.Z_min={range:-1},n.forEach(e=>{let t=`N_${e}`;y.variables[t]={[`count_link_${e}`]:1,[`max_bound_${e}`]:-1,[`min_bound_${e}`]:-1},y.ints[t]=1,y.constraints[`count_link_${e}`]={equal:0},y.constraints[`max_bound_${e}`]={min:0},y.variables.Z_max[`max_bound_${e}`]=1,y.constraints[`min_bound_${e}`]={max:0},y.variables.Z_min[`min_bound_${e}`]=1}),o.forEach(e=>{let t=`runner_assign_${e}`;y.constraints[t]={equal:1},n.forEach(n=>{let r=`assign_${e}_${n}`;y.variables[r]={[t]:1,[`count_link_${n}`]:-1},y.ints[r]=1;let a=`ability_${e}_${n}`;y.constraints[a]={min:0,max:$[`${e}|${n}`]},y.variables[r][a]=1})});let x=solver.Solve(y);if(!x.feasible)return{error:"No feasible solution found. Cannot assign all runners based on preferences."};let v=x.result,w={optimize:"totalCost",opType:"min",constraints:{},variables:{},ints:{}};w.variables.Z_max_2={fixed_range:1},w.variables.Z_min_2={fixed_range:-1},n.forEach(e=>{let t=`N2_${e}`;w.variables[t]={[`count_link_2_${e}`]:1,[`max_bound_2_${e}`]:-1,[`min_bound_2_${e}`]:-1},w.ints[t]=1,w.constraints[`count_link_2_${e}`]={equal:0},w.constraints[`max_bound_2_${e}`]={min:0},w.variables.Z_max_2[`max_bound_2_${e}`]=1,w.constraints[`min_bound_2_${e}`]={max:0},w.variables.Z_min_2[`min_bound_2_${e}`]=1}),o.forEach(e=>{let t=`runner_assign_2_${e}`;w.constraints[t]={equal:1},n.forEach(n=>{let a=`assign_${e}_${n}`,s=r[n]-m[`${e}|${n}`];w.variables[a]={totalCost:s,[t]:1,[`count_link_2_${n}`]:-1},w.ints[a]=1;let l=`ability_2_${e}_${n}`;w.constraints[l]={min:0,max:$[`${e}|${n}`]},w.variables[a][l]=1})}),w.constraints.fixed_range={equal:v};let E=solver.Solve(w);if(!E.feasible)return{error:"Failed to find a pace-optimal solution that maintains the minimum group balance. Try reducing constraints."};let _={assignments:{},groups:{}};for(let S in n.forEach(e=>_.groups[e]=[]),e){for(let C of n)1===E[`assign_${S}_${C}`]&&(_.assignments[S]=C,_.groups[C].push(S));delete e[S].paces}return _.meta={minRange:v,totalCost:E.result},_}function runSolver(){if(syncData(),!inputChanged&&hasEverSolved){sEl.textContent="Status: Input has not changed since last successful solve.",sEl.className="font-bold text-lg mb-4 text-gray-800";return}resEl.innerHTML="",sEl.textContent="Status: Validating runner data...",sEl.className="font-bold text-lg mb-4 text-gray-800";let e={},t=!1,n=!1,r=findDups(),a=r.size>0;if(Object.values(R).forEach(a=>{if(validateRow(a.id,r),!a.active)return;let s=a.name;s.trim()||(t=!0),s.trim()&&0===a.paces.length&&(n=!0),s.trim()&&a.paces.length>0&&!r.has(a.id)&&(e[a.id]=a)}),t||a||n){let s=[];t&&s.push("One or more active runners are missing a **Name**."),a&&s.push("One or more active runners have **Duplicate Names**."),n&&s.push("One or more active runners have **No Pace Preferences** selected."),sEl.textContent=`Error: Data validation failed. ${s.join(" ")}`,sEl.className="error font-bold text-lg mb-4","pace"===currentView&&switchView("runner"),setBtnState(!0);return}if(0===Object.keys(e).length){sEl.textContent="Status: No active or valid runner data provided.",sEl.className="font-bold text-lg mb-4 text-gray-800",setBtnState(!1);return}let l=solveAssignmentProblem(e);l.error?(sEl.textContent=`Error: ${l.error}`,sEl.className="error font-bold text-lg mb-4",resEl.innerHTML='<p class="text-red-600 p-3 bg-red-50 rounded-lg">Optimization failed. Check if all active runners have at least one pace preference selected and if the preferences allow for a balanced solution.</p>',setBtnState(!0)):(sEl.textContent="Status: Done!",sEl.className="success font-bold text-lg mb-4",displayResults(l,e),inputChanged=!1,hasEverSolved=!0,setBtnState(!1))}function displayResults(e,t){result_string="",resEl.innerHTML=`
+            `;
+                return row;
+            }
+
+            /**
+             * Renders the Runner View (runners-list table body).
+             */
+            function renderRView() {
+                const tableBody = document.getElementById('runners-list');
+                tableBody.innerHTML = '';
+                const sortedRunners = Object.values(R).sort((a, b) => a.seniority - b.seniority);
+                const duplicateIds = findDups();
+
+                sortedRunners.forEach((runner, index) => {
+                    const newRow = renderRRow(runner, index);
+                    tableBody.appendChild(newRow);
+                    validateRow(runner.id, duplicateIds);
+                });
+
+                setupRListeners();
+            }
+
+            /**
+             * Sets up the event listeners on the runners list for input/change events.
+             */
+            function setupRListeners() {
+                const runnersListEl = document.getElementById('runners-list');
+                // Remove previous listeners to prevent duplicates
+                runnersListEl.removeEventListener('change', handleRInput);
+                runnersListEl.removeEventListener('input', handleRInput);
+
+                // Add new listeners
+                runnersListEl.addEventListener('change', handleRInput); // for checkboxes and toggles
+                runnersListEl.addEventListener('input', handleRInput); // for text and number inputs
+            }
+
+            /**
+             * Handles input and change events in the Runner View, updating the data store and running validation.
+             * @param {Event} e The event object.
+             */
+            function handleRInput(e) {
+                const target = e.target;
+                const rId = target.dataset.runnerId;
+
+                if (!R[rId]) return;
+
+                // Update data based on the input type
+                if (target.classList.contains('runner-name')) {
+                    updateRunnerData(rId, 'name', target.value.trim());
+                } else if (target.classList.contains('runner-seniority')) {
+                    updateRunnerData(rId, 'seniority', parseInt(target.value));
+                } else if (target.classList.contains('runner-active-toggle')) {
+                    updateRunnerData(rId, 'active', target.checked);
+                } else if (target.classList.contains('pace-checkbox')) {
+                    const runner = R[rId];
+                    const currentPaces = runner.paces;
+                    const paceValue = target.getAttribute('data-pace');
+
+                    if (target.checked) {
+                        if (!currentPaces.includes(paceValue)) {
+                            currentPaces.push(paceValue);
+                        }
+                    } else {
+                        const index = currentPaces.indexOf(paceValue);
+                        if (index > -1) {
+                            currentPaces.splice(index, 1);
+                        }
+                    }
+                    runner.paces = currentPaces;
+                }
+
+                const duplicateIds = findDups();
+
+                // Re-validate all rows when names or active status changes (as it affects duplicates/active status)
+                if (target.classList.contains('runner-name') || target.classList.contains('runner-active-toggle')) {
+                    Object.keys(R).forEach(id => {
+                        validateRow(id, duplicateIds);
+                    });
+                } else {
+                    // Otherwise, just validate the current row
+                    validateRow(rId, duplicateIds);
+                }
+
+                markChanged();
+            }
+
+            /**
+             * Synchronizes the DOM state (inputs) back to the global R data store.
+             * This is crucial before solving or switching from Runner View.
+             */
+            function syncData() {
+                if (currentView === 'pace') return; // Only sync if we are in Runner View
+
+                const rows = document.querySelectorAll('.runner-row');
+                const duplicateIds = findDups();
+
+                rows.forEach(row => {
+                    const rId = row.id.replace('runner-row-', '');
+                    if (!R[rId]) return;
+
+                    const nameInput = row.querySelector('.runner-name');
+                    const seniorityInput = row.querySelector('.runner-seniority');
+                    const activeToggle = row.querySelector('.runner-active-toggle');
+                    const paceCheckboxes = row.querySelectorAll('.pace-checkbox');
+
+                    const selectedPaces = Array.from(paceCheckboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.getAttribute('data-pace'));
+
+                    R[rId].name = nameInput.value.trim();
+                    R[rId].seniority = parseInt(seniorityInput.value) || 1;
+                    R[rId].paces = selectedPaces;
+                    R[rId].active = activeToggle.checked;
+
+                    validateRow(rId, duplicateIds);
+                });
+            }
+
+            // --- Import/Export Functions ---
+
+            /**
+             * Exports the runner data as a JSON string, copying it to the clipboard.
+             */
+            function exportRunners() {
+                syncData(); // Ensure R is up-to-date
+                const runnerData = Object.values(R)
+                    .filter(r => r.name) // Don't export unnamed runners
+                    .map(r => ({
+                        name: r.name,
+                        seniority: r.seniority,
+                        paces: r.paces,
+                        active: r.active
+                    }));
+
+                const jsonString = JSON.stringify(runnerData, null, 2);
+
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(jsonString).then(() => {
+                        sEl.textContent = 'Status: Runner data copied to clipboard as JSON!';
+                        sEl.className = 'success font-bold text-lg mb-4';
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        // Fallback for browsers without clipboard access
+                        prompt("Copy the following JSON data manually:", jsonString);
+                        sEl.textContent = 'Status: Clipboard copy failed. Data ready in prompt box for manual copy.';
+                        sEl.className = 'font-bold text-lg mb-4 text-secondary';
+                    });
+                } else {
+                    // Fallback for browsers without clipboard support
+                    prompt("Copy the following JSON data manually:", jsonString);
+                    sEl.textContent = 'Status: Runner data ready in prompt box for manual copy.';
+                    sEl.className = 'font-bold text-lg mb-4 text-secondary';
+                }
+            }
+
+            function exportAssignments() {
+                syncData(); // Ensure R is up-to-date
+                // const runnerData = Object.values(R)
+                //     .filter(r => r.name) // Don't export unnamed runners
+                //     .map(r => ({
+                //         name: r.name,
+                //         seniority: r.seniority,
+                //         paces: r.paces,
+                //         active: r.active
+                //     }));
+
+                const jsonString = result_string
+
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(jsonString).then(() => {
+                        sEl.textContent = 'Status: Runner assignments copied to clipboard!';
+                        sEl.className = 'success font-bold text-lg mb-4';
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        // Fallback for browsers without clipboard access
+                        prompt("Copy the following JSON data manually:", jsonString);
+                        sEl.textContent = 'Status: Clipboard copy failed. Data ready in prompt box for manual copy.';
+                        sEl.className = 'font-bold text-lg mb-4 text-secondary';
+                    });
+                } else {
+                    // Fallback for browsers without clipboard support
+                    prompt("Copy the following JSON data manually:", jsonString);
+                    sEl.textContent = 'Status: Runner assignments ready in prompt box for manual copy.';
+                    sEl.className = 'font-bold text-lg mb-4 text-secondary';
+                }
+            }
+
+            /**
+             * Imports runner data from a JSON string provided by the user.
+             */
+            function importRunners() {
+                const importString = prompt("Paste the JSON string containing runner data here:");
+
+                if (!importString) {
+                    sEl.textContent = 'Status: Import cancelled.';
+                    sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+                    return;
+                }
+
+                try {
+                    const importedRunners = JSON.parse(importString);
+
+                    // Basic validation of the imported structure
+                    if (!Array.isArray(importedRunners) || importedRunners.some(r => typeof r !== 'object' || r.name === undefined || r.seniority === undefined)) {
+                        throw new Error("Invalid JSON structure. Expected an array of runner objects with 'name' and 'seniority' fields.");
+                    }
+
+                    clearAllRunners(true); // Clear data but skip adding a new default row
+
+                    importedRunners.forEach(runner => {
+                        createNewRunnerInData(
+                            runner.name,
+                            runner.seniority,
+                            runner.paces || [],
+                            runner.active !== undefined ? runner.active : true
+                        );
+                    });
+
+                    if (currentView === 'runner') {
+                        renderRView();
+                    } else {
+                        renderPView();
+                    }
+
+                    markChanged();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    sEl.textContent = `Status: Successfully imported ${importedRunners.length} runners. Run the solver to get assignments.`;
+                    sEl.className = 'success font-bold text-lg mb-4';
+
+                } catch (e) {
+                    console.error('Import Error:', e);
+                    sEl.textContent = `Error: Failed to import data. ${e.message || 'Invalid JSON format.'}`;
+                    sEl.className = 'error font-bold text-lg mb-4';
+                }
+            }
+
+            // --- Optimization Solver Functions ---
+
+            /**
+             * Generates the list of available pace groups (PACES) and their cost values (pace in minutes).
+             * @returns {object} Map of pace string to minutes/mile float.
+             */
+            function generatePaceGroups() {
+                const paces = {};
+                // Paces from 7:00 (14 half-minutes) to 11:00 (22 half-minutes)
+                for (let halfMinute = 14; halfMinute <= 22; halfMinute++) {
+                    const paceMinutes = halfMinute / 2.0;
+                    const minutes = Math.floor(paceMinutes);
+                    const seconds = Math.round((paceMinutes - minutes) * 60);
+                    const paceStr = `${minutes}:${seconds.toString().padStart(2, '0')} min/mile`;
+                    paces[paceStr] = paceMinutes;
+                }
+                return paces;
+            }
+
+            /**
+             * Solves the assignment problem using the javascript-lp-solver library.
+             * This is a two-phase optimization problem:
+             * 1. Minimize the range (max group size - min group size).
+             * 2. Minimize total pace cost (prioritizing faster, preferred paces) while keeping the optimal range from Phase 1.
+             * @param {object} runnerInputData Filtered data of active, valid runners.
+             * @returns {object} The final assignments object or an error message.
+             */
+            function solveAssignmentProblem(runnerInputData) {
+                const paceGroups = generatePaceGroups();
+                const G = Object.keys(paceGroups); // Pace Groups (Goals)
+                const PACE_COSTS = { ...paceGroups }; // Pace time in minutes
+                const MAX_PACE_COST = Math.max(...Object.values(PACE_COSTS));
+
+                const R_unsorted = Object.keys(runnerInputData); // Runner IDs (Individuals)
+                if (R_unsorted.length === 0) return { error: "No active runners provided for assignment." };
+
+                // Prepare preferences and ranks
+                const runnerPreferences = {};
+                const seniorityRanks = {};
+                R_unsorted.forEach(rId => {
+                    runnerPreferences[rId] = runnerInputData[rId].paces;
+                    seniorityRanks[rId] = runnerInputData[rId].seniority;
+                });
+
+                // Sort runners by seniority (for deterministic assignment priority)
+                const R = R_unsorted.sort((a, b) => {
+                    const rankDiff = seniorityRanks[a] - seniorityRanks[b];
+                    // If ranks are equal, sort by ID to ensure consistency
+                    return rankDiff !== 0 ? rankDiff : a.localeCompare(b);
+                });
+
+                // --- Optimization Model Setup ---
+
+                // Constants for tie-breaking and objective function
+                const epsilon = 0.000001; // Small value for reward weighting
+                const MAX_RANK = Math.max(...Object.values(seniorityRanks));
+
+                // Seniority Reward Factor: Higher for lower seniority number (e.g., Seniority 1 gets MAX_RANK)
+                const SENIORITY_REWARD_FACTOR = Object.fromEntries(R.map(r => [r, MAX_RANK + 1 - seniorityRanks[r]]));
+
+                // Pace Speed/Distance: Higher for faster (lower pace cost)
+                const PACE_SPEED_DISTANCE = Object.fromEntries(G.map(g => [g, MAX_PACE_COST - PACE_COSTS[g]]));
+
+                // Calculate the total seniority/pace reward for each potential assignment (r -> g)
+                const PACE_SENIORITY_REWARD = {};
+                for (const r of R) {
+                    for (const g of G) {
+                        const isPreferred = runnerPreferences[r].includes(g);
+                        // Only reward for preferred paces. Reward is based on seniority AND pace speed.
+                        PACE_SENIORITY_REWARD[`${r}|${g}`] = isPreferred
+                            ? (SENIORITY_REWARD_FACTOR[r] * PACE_SPEED_DISTANCE[g] * epsilon)
+                            : 0;
+                    }
+                }
+
+                // Ability Constraint: 1 if the runner prefers the pace, 0 otherwise
+                const ability = {};
+                for (const r of R) {
+                    for (const g of G) {
+                        ability[`${r}|${g}`] = runnerPreferences[r].includes(g) ? 1 : 0;
+                    }
+                }
+
+                // --- Phase 1: Minimize Group Size Range (Max - Min) ---
+
+                let model1 = {
+                    optimize: "range", // Minimize Z_max - Z_min
+                    opType: "min",
+                    constraints: {},
+                    variables: {},
+                    ints: {} // Integer constraints for assignments and counts
+                };
+
+                // Range Variables: range is Z_max - Z_min. We want to minimize this.
+                model1.variables["Z_max"] = { range: 1 };
+                model1.variables["Z_min"] = { range: -1 };
+
+                // Group Size Constraints (N_g >= Z_min and N_g <= Z_max)
+                G.forEach(g => {
+                    const countVar = `N_${g}`;
+                    model1.variables[countVar] = {
+                        [`count_link_${g}`]: 1, // links to the count constraint
+                        [`max_bound_${g}`]: -1, // links to Z_max
+                        [`min_bound_${g}`]: -1 // links to Z_min
+                    };
+                    model1.ints[countVar] = 1; // Group count must be integer
+
+                    // N_g - sum(assignments) = 0
+                    model1.constraints[`count_link_${g}`] = { equal: 0 };
+
+                    // N_g - Z_max <= 0  =>  N_g <= Z_max
+                    model1.constraints[`max_bound_${g}`] = { min: 0 }; // min: 0 means N_g - Z_max >= 0 or - (N_g - Z_max) <= 0
+                    model1.variables["Z_max"][`max_bound_${g}`] = 1;
+
+                    // -N_g + Z_min <= 0 => Z_min <= N_g
+                    model1.constraints[`min_bound_${g}`] = { max: 0 }; // max: 0 means -N_g + Z_min <= 0
+                    model1.variables["Z_min"][`min_bound_${g}`] = 1;
+                });
+
+                // Runner Assignment Constraints (Each runner assigned exactly once)
+                R.forEach(r => {
+                    const runnerConstraint = `runner_assign_${r}`;
+                    model1.constraints[runnerConstraint] = { equal: 1 };
+
+                    G.forEach(g => {
+                        const assignVar = `assign_${r}_${g}`;
+                        model1.variables[assignVar] = {
+                            [runnerConstraint]: 1, // Sum of assignments for runner r must equal 1
+                            [`count_link_${g}`]: -1 // Subtracts 1 from the group count N_g
+                        };
+                        model1.ints[assignVar] = 1; // Assignment must be integer (0 or 1)
+
+                        // Ability Constraint: Must only assign if the runner prefers the pace
+                        const abilityConstraint = `ability_${r}_${g}`;
+                        model1.constraints[abilityConstraint] = { min: 0, max: ability[`${r}|${g}`] };
+                        model1.variables[assignVar][abilityConstraint] = 1;
+                    });
+                });
+
+                let results1 = solver.Solve(model1);
+
+                if (!results1.feasible) {
+                    return { error: "No feasible solution found. Cannot assign all runners based on preferences." };
+                }
+
+                const optimalRange = results1.result;
+
+                // --- Phase 2: Minimize Total Pace Cost + Maximize Seniority/Preference Reward ---
+
+                let model2 = {
+                    optimize: "totalCost",
+                    opType: "min",
+                    constraints: {},
+                    variables: {},
+                    ints: {}
+                };
+
+                // Constraint: The range must be fixed to the optimal range from Phase 1
+                model2.variables["Z_max_2"] = { fixed_range: 1 };
+                model2.variables["Z_min_2"] = { fixed_range: -1 };
+
+                // Group size constraints (re-added for integrity, linked to Phase 2 variables)
+                G.forEach(g => {
+                    const countVar = `N2_${g}`;
+                    model2.variables[countVar] = {
+                        [`count_link_2_${g}`]: 1,
+                        [`max_bound_2_${g}`]: -1,
+                        [`min_bound_2_${g}`]: -1
+                    };
+                    model2.ints[countVar] = 1;
+
+                    model2.constraints[`count_link_2_${g}`] = { equal: 0 };
+
+                    // N_g - Z_max <= 0  =>  N_g <= Z_max
+                    model2.constraints[`max_bound_2_${g}`] = { min: 0 };
+                    model2.variables["Z_max_2"][`max_bound_2_${g}`] = 1;
+
+                    // -N_g + Z_min <= 0 => Z_min <= N_g
+                    model2.constraints[`min_bound_2_${g}`] = { max: 0 };
+                    model2.variables["Z_min_2"][`min_bound_2_${g}`] = 1;
+                });
+
+                // Runner Assignment Constraints (Each runner assigned exactly once)
+                R.forEach(r => {
+                    const runnerConstraint = `runner_assign_2_${r}`;
+                    model2.constraints[runnerConstraint] = { equal: 1 };
+
+                    G.forEach(g => {
+                        const assignVar = `assign_${r}_${g}`;
+
+                        // Cost calculation: Pace Cost - Seniority/Preference Reward (Minimizing Cost maximizes the Reward)
+                        const cost = PACE_COSTS[g] - PACE_SENIORITY_REWARD[`${r}|${g}`];
+
+                        model2.variables[assignVar] = {
+                            totalCost: cost, // Objective function coefficient
+                            [runnerConstraint]: 1,
+                            [`count_link_2_${g}`]: -1
+                        };
+                        model2.ints[assignVar] = 1;
+
+                        // Ability Constraint: Must only assign if the runner prefers the pace
+                        const abilityConstraint = `ability_2_${r}_${g}`;
+                        model2.constraints[abilityConstraint] = { min: 0, max: ability[`${r}|${g}`] };
+                        model2.variables[assignVar][abilityConstraint] = 1;
+                    });
+                });
+
+                // Fix the range constraint from Phase 1
+                model2.constraints["fixed_range"] = { equal: optimalRange };
+
+                let results2 = solver.Solve(model2);
+
+                if (!results2.feasible) {
+                    return { error: "Failed to find a pace-optimal solution that maintains the minimum group balance. Try reducing constraints." };
+                }
+
+                // --- Process Final Results ---
+
+                const finalAssignments = {
+                    assignments: {}, // { runnerId: paceString }
+                    groups: {} // { paceString: [runnerId, ...] }
+                };
+                G.forEach(g => finalAssignments.groups[g] = []);
+
+                for (const rId in runnerInputData) {
+                    for (const g of G) {
+                        // Check if the variable for this assignment is 1 (assigned)
+                        if (results2[`assign_${rId}_${g}`] === 1) {
+                            finalAssignments.assignments[rId] = g;
+                            finalAssignments.groups[g].push(rId);
+                        }
+                    }
+                    // Clean up the pace array in the input data (passed by reference)
+                    delete runnerInputData[rId].paces;
+                }
+
+                finalAssignments.meta = {
+                    minRange: optimalRange,
+                    totalCost: results2.result
+                };
+
+                return finalAssignments;
+            }
+
+            /**
+             * Main function to run the optimization solver.
+             */
+            function runSolver() {
+                // 1. Ensure all current inputs in Runner View are synced to the data store
+                syncData();
+
+                // Check if input has changed since the last solve
+                if (!inputChanged && hasEverSolved) {
+                    sEl.textContent = 'Status: Input has not changed since last successful solve.';
+                    sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+                    return;
+                }
+
+                resEl.innerHTML = '';
+                sEl.textContent = 'Status: Validating runner data...';
+                sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+
+                const activeRunnerData = {};
+                let blankNameFound = false;
+                let missingPacesFound = false;
+                const duplicateIds = findDups();
+                let duplicateFound = duplicateIds.size > 0;
+
+                // Filter and validate runners
+                Object.values(R).forEach(runner => {
+                    validateRow(runner.id, duplicateIds); // Apply validation styling
+                    if (!runner.active) return; // Skip inactive runners
+
+                    const name = runner.name;
+                    if (!name.trim()) {
+                        blankNameFound = true;
+                    }
+                    if (name.trim() && runner.paces.length === 0) {
+                        missingPacesFound = true;
+                    }
+
+                    // Only add valid, active runners for solving
+                    if (name.trim() && runner.paces.length > 0 && !duplicateIds.has(runner.id)) {
+                        activeRunnerData[runner.id] = runner;
+                    }
+                });
+
+                // Handle validation errors
+                if (blankNameFound || duplicateFound || missingPacesFound) {
+                    let errorMessages = [];
+                    if (blankNameFound) errorMessages.push("One or more active runners are missing a **Name**.");
+                    if (duplicateFound) errorMessages.push("One or more active runners have **Duplicate Names**.");
+                    if (missingPacesFound) errorMessages.push("One or more active runners have **No Pace Preferences** selected.");
+
+                    sEl.textContent = `Error: Data validation failed. ${errorMessages.join(' ')}`;
+                    sEl.className = 'error font-bold text-lg mb-4';
+
+                    // Ensure user is on the view where they can see the errors
+                    if (currentView === 'pace') switchView('runner');
+                    setBtnState(true);
+                    return;
+                }
+
+                if (Object.keys(activeRunnerData).length === 0) {
+                    sEl.textContent = "Status: No active or valid runner data provided.";
+                    sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+                    setBtnState(false);
+                    return;
+                }
+
+                // Run the solver
+                const assignments = solveAssignmentProblem(activeRunnerData);
+
+                if (assignments.error) {
+                    // Handle solver errors (infeasible solution)
+                    sEl.textContent = `Error: ${assignments.error}`;
+                    sEl.className = 'error font-bold text-lg mb-4';
+                    resEl.innerHTML = `<p class="text-red-600 p-3 bg-red-50 rounded-lg">Optimization failed. Check if all active runners have at least one pace preference selected and if the preferences allow for a balanced solution.</p>`;
+                    setBtnState(true);
+                } else {
+                    // Successful solve
+                    sEl.textContent = 'Status: Done!';
+                    sEl.className = 'success font-bold text-lg mb-4';
+                    displayResults(assignments, activeRunnerData);
+                    inputChanged = false;
+                    hasEverSolved = true;
+                    setBtnState(false);
+                }
+            }
+
+            /**
+             * Renders the final assignment results to the results-display area.
+             * @param {object} assignments The final assignment object from the solver.
+             * @param {object} runnerInputData The active runner data used by the solver.
+             */
+            function displayResults(assignments, runnerInputData) {
+                result_string = ''
+                resEl.innerHTML = `
                 <h3 class="font-semibold text-lg text-gray-800 pb-2">Assignments by Pace Group</h3>
                 <div id="groups-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            `;let n=document.getElementById("groups-list"),r=Object.keys(e.groups).sort((e,t)=>{let n=e=>{let[t,n]=e.split(" ")[0].split(":").map(Number);return t+n/60};return n(e)-n(t)});r.forEach(r=>{let a=e.groups[r];if(out_string=r.split(" ")[0]+": ",first_runner=!0,a.length>0){let s=a.sort((e,n)=>t[e].seniority-t[n].seniority),l=s.map(e=>{let n=t[e];return first_runner?out_string+=n.name:out_string+=", "+n.name,`<span class="inline-block bg-primary/20 text-primary px-2 py-0.5 text-xs font-medium rounded-full m-0.5">${n.name} (${n.seniority})</span>`}).join("");n.innerHTML+=`
+            `;
+
+                const groupsListEl = document.getElementById('groups-list');
+
+                // Sort paces from fastest to slowest for display
+                const sortedPaces = Object.keys(assignments.groups).sort((a, b) => {
+                    const paceToMinutes = (paceStr) => {
+                        const [minutes, seconds] = paceStr.split(' ')[0].split(':').map(Number);
+                        return minutes + seconds / 60;
+                    };
+                    return paceToMinutes(a) - paceToMinutes(b);
+                });
+
+                sortedPaces.forEach(pace => {
+                    const runnersInAssignment = assignments.groups[pace];
+
+                    out_string = pace.split(' ')[0] + ": "
+                    first_runner = true
+
+                    if (runnersInAssignment.length > 0) {
+                        // Sort runners within the group by seniority
+                        const sortedRunnersInGroup = runnersInAssignment.sort((aId, bId) => runnerInputData[aId].seniority - runnerInputData[bId].seniority);
+
+                        const runnersHtml = sortedRunnersInGroup.map(rId => {
+                            const runner = runnerInputData[rId];
+                            if (first_runner) {
+                                out_string += runner.name
+                            } else {
+                                out_string += ", " + runner.name
+                            }
+
+                            return `<span class="inline-block bg-primary/20 text-primary px-2 py-0.5 text-xs font-medium rounded-full m-0.5">${runner.name} (${runner.seniority})</span>`;
+                        }).join('');
+
+                        groupsListEl.innerHTML += `
                         <div class="p-4 bg-white shadow rounded-lg border-l-4 border-primary">
-                            <p class="font-bold text-md mb-2">${r} <span class="text-gray-500 font-normal">(${a.length} runners)</span></p>
-                            <div class="flex flex-wrap">${l}</div>
+                            <p class="font-bold text-md mb-2">${pace} <span class="text-gray-500 font-normal">(${runnersInAssignment.length} runners)</span></p>
+                            <div class="flex flex-wrap">${runnersHtml}</div>
                         </div>
-                    `}result_string+=out_string+"\n"})}window.onload=()=>{createNewRunnerInData("",1,[],!0),switchView("runner"),sEl.textContent="Status: Ready to configure runners and solve.",sEl.className="font-bold text-lg mb-4 text-gray-800"};    </script>
+                    `;
+                    }
+                    result_string += out_string + "\n"
+
+                });
+            }
+
+
+            // --- Initialization ---
+
+            window.onload = () => {
+                // Add one initial blank runner row on load
+                createNewRunnerInData("", 1, [], true);
+                switchView('runner'); // Render the default view
+                sEl.textContent = 'Status: Ready to configure runners and solve.';
+                sEl.className = 'font-bold text-lg mb-4 text-gray-800';
+            };
+        </script>
 </body>
+
 </html>

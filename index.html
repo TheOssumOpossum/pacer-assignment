@@ -412,7 +412,7 @@
             // Global Constants and State
             const PACES = [
                 '7:00 min/mile', '7:30 min/mile', '8:00 min/mile', '8:30 min/mile', '9:00 min/mile',
-                '9:30 min/mile', '10:00 min/mile', '10:30 min/mile', '11:00 min/mile', '11:30 min/mile', '12:00 min/mile', 'Walk'
+                '9:30 min/mile', '10:00 min/mile', '10:30 min/mile', '11:00 min/mile', '11:30 min/mile', '12:00 min/mile', '12:30 min/mile'
             ];
             let R = {}; // Runner data store: { runnerId: { id, name, seniority, paces, active } }
             let result_string = '' // Runner data final
@@ -1250,14 +1250,13 @@
             function generatePaceGroups() {
                 const paces = {};
                 // Paces from 7:00 (14 half-minutes) to 12:30 (25 half-minutes)
-                for (let halfMinute = 14; halfMinute <= 24; halfMinute++) {
+                for (let halfMinute = 14; halfMinute <= 25; halfMinute++) {
                     const paceMinutes = halfMinute / 2.0;
                     const minutes = Math.floor(paceMinutes);
                     const seconds = Math.round((paceMinutes - minutes) * 60);
                     const paceStr = `${minutes}:${seconds.toString().padStart(2, '0')} min/mile`;
                     paces[paceStr] = paceMinutes;
                 }
-                paces['Walk']=12.5
                 return paces;
             }
 
